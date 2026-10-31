@@ -149,6 +149,18 @@ input:focus,select:focus,textarea:focus{border-color:var(--pink);outline:none}
 .tag{background:var(--pink);color:#fff;border-radius:99px;padding:3px 10px;font-size:14px;font-weight:800}
 .delta{color:#7ee36b;font-size:15px}
 .opt.tally{cursor:default}
+.rename{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;max-width:420px;margin:6px auto}
+.rename.host{align-items:stretch;max-width:520px;background:rgba(255,255,255,.08);border-radius:16px;padding:12px 14px;margin:0}
+.rcur{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;font-size:17px}
+.rform{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%}
+.rform[hidden],.rcur[hidden]{display:none}
+.rrow{display:flex;gap:8px;width:100%}
+.rrow input{flex:1;min-width:0;padding:10px 12px;font-size:17px}
+.rlabel{font-weight:700;font-size:14px;color:var(--muted)}
+.rmsg{min-height:1.2em;font-weight:700;font-size:14px}
+.rmsg.ok{color:#9ef08c}
+.rmsg.bad{color:#ffb4b4}
+[data-players] .chip{animation:none}
 #app .screen{min-height:calc(100vh - 44px);min-height:calc(100dvh - 44px)}
 .vfoot{display:flex;justify-content:center;padding:8px 16px 14px}
 .vbtn{background:none;border:0;color:var(--muted);font:600 13px Rubik,sans-serif;cursor:pointer;padding:6px 10px;border-radius:99px}
@@ -541,8 +553,13 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.9';
+const VERSION = '1.10';
 const PATCH_NOTES = [
+  {v:'1.10', date:'31 ottobre 2026', items:[
+    'Nella lobby ogni giocatore, host compreso, può cambiare il proprio nome',
+    'Il cambio nome funziona prima della prima partita e tra una partita e l\'altra',
+    'Non si può scegliere un nome già usato da un altro giocatore'
+  ]},
   {v:'1.9', date:'31 ottobre 2026', items:[
     'Oltre 200 frasi nuove: ora sono più di 270 in tutto',
     'Nuovi temi: casa, famiglia, amore, lavoro e scuola, cibo, tecnologia, animali, Halloween, fantasy, storia, sport, musica e TV, viaggi, notizie assurde',
@@ -707,6 +724,8 @@ function localRecv(m){
   if (!H.me) return;
   if (m.t === 'joined'){ const p = H.players.find(x => x.conn === LOCAL); if (p){ p.host = true; H.me.id = p.id; } }
   else if (m.t === 'view'){ H.me.view = m.v; if (document.getElementById('hp')) drawHP(); else drawMe(); }
+  else if (m.t === 'renamed'){ store('tb_name', m.name); const e = document.getElementById('hrmsg'); if (e){ e.className = 'rmsg ok'; e.textContent = 'Nome cambiato!'; } }
+  else if (m.t === 'renameErr'){ const e = document.getElementById('hrmsg'); if (e){ e.className = 'rmsg bad'; e.textContent = m.msg; } }
 }
 function drawMe(){
   const el = document.getElementById('me');
@@ -820,6 +839,18 @@ function hostMsg(conn, d){
   const p = H.players.find(x => x.conn === conn);
   if (!p) return;
 
+  if (d.t === 'rename'){
+    const err = msg => send(conn, {t:'renameErr', msg});
+    if (H.phase !== 'lobby') return err('Puoi cambiare nome solo nella lobby, tra una partita e l\'altra.');
+    const name = String(d.name || '').trim().replace(/\s+/g, ' ').slice(0, 16);
+    if (!name) return err('Scrivi un nome.');
+    if (name === p.name) return send(conn, {t:'renamed', name});
+    if (H.players.some(x => x !== p && x.name.toLowerCase() === name.toLowerCase())) return err('Questo nome è già usato da un altro giocatore.');
+    p.name = name;
+    send(conn, {t:'renamed', name});
+    broadcast(); renderHost();
+    return;
+  }
   if (d.t === 'answer' && H.phase === 'answer'){
     const m = H.matchups[d.mid];
     if (!m || !m.players.includes(p.id) || m.answers[p.id]) return;
@@ -1021,7 +1052,7 @@ function viewFor(p){
              left: H.timerEnd ? Math.max(0, H.timerEnd - Date.now()) : 0, total: H.timerTotal};
   const W = (emoji, title, msg) => Object.assign(v, {type:'wait', emoji, title, msg});
   switch (H.phase){
-    case 'lobby': return Object.assign(v, {type:'lobby', code:H.code, players:H.players.map(x => ({name:x.name, color:x.color, host:!!x.host}))});
+    case 'lobby': return Object.assign(v, {type:'lobby', code:H.code, players:H.players.map(x => ({name:x.name, color:x.color, host:!!x.host, me:x.id === p.id}))});
     case 'intro': return W('🔥', H.round < 3 ? 'Round ' + H.round : 'Round finale', introText());
     case 'answer': {
       const mine = H.matchups.map((m, i) => ({m, i})).filter(x => x.m.players.includes(p.id));
@@ -1117,6 +1148,10 @@ VIEW.lobby = () => {
       </div>
       <h3>Giocatori <span id="pcount" class="muted"></span></h3>
       <div id="plist" class="chips" style="justify-content:flex-start"></div>
+      ${H.me ? `<div class="rename host">
+        <label class="rlabel" for="hrname">Il tuo nome</label>
+        <div class="rrow"><input id="hrname" maxlength="16" autocomplete="off" value="${esc((byId(H.me.id) || {}).name || '')}"><button class="btn small alt" id="hrbtn">Cambia nome</button></div>
+        <div id="hrmsg" class="rmsg"></div></div>` : ''}
       <div class="row" style="justify-content:flex-start"><button class="btn alt" id="invite">📤 Invita amici</button><span id="invmsg" class="muted small"></span></div>
       <button class="btn big" id="startBtn">Inizia</button>
       <p class="muted small">Da 3 a 10 giocatori. Tieni aperta questa pagina: è lei che gestisce la partita.</p>
@@ -1135,6 +1170,15 @@ VIEW.lobby = () => {
     try { new QRCode(qr, {text:url, width:160, height:160, colorDark:'#1b0f3b', colorLight:'#ffffff'}); } catch(e){ qr.remove(); }
   } else qr.remove();
   $('#startBtn').onclick = startGame;
+  if (H.me){
+    const doRename = () => {
+      const n = $('#hrname').value.trim();
+      if (!n){ $('#hrmsg').className = 'rmsg bad'; $('#hrmsg').textContent = 'Scrivi un nome.'; return; }
+      hostMsg(LOCAL, {t:'rename', name:n});
+    };
+    $('#hrbtn').onclick = doRename;
+    $('#hrname').onkeydown = e => { if (e.key === 'Enter') doRename(); };
+  }
   $('#invite').onclick = async () => {
     const text = `Giochiamo a Tappabuchi! Entra con il codice ${H.code}`;
     try {
@@ -1385,9 +1429,15 @@ function playerMsg(d, to){
   if (!d || typeof d !== 'object') return;
   if (d.t === 'err'){ clearTimeout(to); cleanupPlayer(); return joinScreen(d.msg); }
   if (d.t === 'joined'){ clearTimeout(to); P.joined = true; P.name = d.name; return; }
+  if (d.t === 'renamed'){ P.name = d.name; store('tb_name', d.name); return; }
+  if (d.t === 'renameErr'){ const e = app.querySelector('[data-rmsg]'); if (e){ e.className = 'rmsg bad'; e.textContent = d.msg; } const b = app.querySelector('[data-rsave]'); if (b) b.disabled = false; return; }
   if (d.t === 'view') renderPlayer(d.v);
 }
 
+function lobbyPlayers(v){
+  return `<div class="muted">Giocatori nella stanza ${esc(v.code)} (${v.players.length})</div>
+    <div class="chips">${v.players.map(x => `<span class="chip ${x.me ? 'mechip' : ''}" style="background:${x.color}">${x.host ? '👑 ' : ''}${esc(x.name)}${x.me ? ' (tu)' : ''}</span>`).join('')}</div>`;
+}
 function statusInner(st){
   const writing = st.filter(x => !x.done), done = st.filter(x => x.done);
   const row = x => `<div class="wrow ${x.done ? 'done' : 'writing'} ${x.me ? 'me' : ''}">
@@ -1401,8 +1451,11 @@ function statusInner(st){
 }
 const statusBlock = v => v.status ? `<div class="wstatus" data-status>${statusInner(v.status)}</div>` : '';
 // aggiorna solo il riquadro "chi sta scrivendo" senza toccare i campi di testo
-function updStatus(root, v){ const el = root.querySelector('[data-status]'); if (el && v.status) el.innerHTML = statusInner(v.status); }
-const viewKey = v => JSON.stringify(Object.assign({}, v, {left:0, status:0}));
+function updStatus(root, v){
+  const el = root.querySelector('[data-status]'); if (el && v.status) el.innerHTML = statusInner(v.status);
+  const pl = root.querySelector('[data-players]'); if (pl && v.players) pl.innerHTML = lobbyPlayers(v);
+}
+const viewKey = v => JSON.stringify(Object.assign({}, v, {left:0, status:0, players:0}));
 
 function playerBody(v, panel){
   if (v.type === 'wait'){
@@ -1422,8 +1475,16 @@ function playerBody(v, panel){
   if (v.type === 'lobby'){
     return `<div class="grow"><div class="emoji">🎉</div><h2 style="font-size:28px">Sei dentro!</h2>
       <p class="lead">Aspetta che l'host avvii la partita.</p>
-      <div class="muted">Giocatori nella stanza ${esc(v.code)} (${v.players.length})</div>
-      <div class="chips">${v.players.map(x => `<span class="chip" style="background:${x.color}">${x.host ? '👑 ' : ''}${esc(x.name)}</span>`).join('')}</div></div>`;
+      <div class="rename">
+        <div class="rcur">Il tuo nome: <b>${esc(v.name)}</b> <button class="btn small ghost" data-redit>✏️ Cambia nome</button></div>
+        <div class="rform" data-rform hidden>
+          <div class="rrow"><input data-rname maxlength="16" autocomplete="off" value="${esc(v.name)}" aria-label="Nuovo nome">
+          <button class="btn small alt" data-rsave>Salva</button></div>
+          <button class="link" data-rcancel>Annulla</button>
+        </div>
+        <div class="rmsg" data-rmsg></div>
+      </div>
+      <div data-players>${lobbyPlayers(v)}</div></div>`;
   }
   if (v.type === 'show'){
     return `<div class="pbanner" style="font-size:22px">${v.mine ? '🥊 È la tua sfida!' : 'Ecco le risposte…'}</div>
@@ -1488,6 +1549,22 @@ function modeOf(v){
 function setMode(v){ document.body.dataset.mode = modeOf(v); }
 
 function wirePlayer(root, v, sendFn){
+  if (v.type === 'lobby'){
+    const form = root.querySelector('[data-rform]'), cur = root.querySelector('.rcur'), inp = root.querySelector('[data-rname]');
+    const msg = root.querySelector('[data-rmsg]'), save = root.querySelector('[data-rsave]');
+    root.querySelector('[data-redit]').onclick = () => { form.hidden = false; cur.hidden = true; msg.textContent = ''; inp.focus(); inp.select(); };
+    root.querySelector('[data-rcancel]').onclick = () => { form.hidden = true; cur.hidden = false; msg.textContent = ''; inp.value = v.name; };
+    const go = () => {
+      const n = inp.value.trim();
+      if (!n){ msg.className = 'rmsg bad'; msg.textContent = 'Scrivi un nome.'; inp.focus(); return; }
+      if (n === v.name){ form.hidden = true; cur.hidden = false; return; }
+      save.disabled = true; msg.className = 'rmsg'; msg.textContent = 'Salvo…';
+      sendFn({t:'rename', name:n});
+    };
+    save.onclick = go;
+    inp.onkeydown = e => { if (e.key === 'Enter') go(); };
+    return;
+  }
   if (v.type === 'answer'){
     const q = v.prompts[0];
     const ins = [...root.querySelectorAll('.ans')];
