@@ -161,6 +161,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--pink);outline:none}
 .rmsg.ok{color:#9ef08c}
 .rmsg.bad{color:#ffb4b4}
 [data-players] .chip{animation:none}
+.nextbar{display:flex;flex-direction:column;gap:6px;width:100%;max-width:700px;margin:0 auto;background:rgba(255,255,255,.08);border-radius:14px;padding:10px 14px}
+.nlabel{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-weight:700;font-size:15px}
+.nlabel b{font-family:Bungee,sans-serif;font-size:20px;color:var(--yellow);white-space:nowrap}
+.nextbar .tbar{flex:none;height:10px}
 #app .screen{min-height:calc(100vh - 44px);min-height:calc(100dvh - 44px)}
 .vfoot{display:flex;justify-content:center;padding:8px 16px 14px}
 .vbtn{background:none;border:0;color:var(--muted);font:600 13px Rubik,sans-serif;cursor:pointer;padding:6px 10px;border-radius:99px}
@@ -553,8 +557,12 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.10';
+const VERSION = '1.11';
 const PATCH_NOTES = [
+  {v:'1.11', date:'31 ottobre 2026', items:[
+    'Barra con il conto alla rovescia nelle schermate del vincitore e di punti e classifica',
+    'La barra dice quale schermata arriva dopo e tra quanti secondi, se l\'host non tocca "Avanti"'
+  ]},
   {v:'1.10', date:'31 ottobre 2026', items:[
     'Nella lobby ogni giocatore, host compreso, può cambiare il proprio nome',
     'Il cambio nome funziona prima della prima partita e tra una partita e l\'altra',
@@ -649,6 +657,9 @@ const norm = s => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
 function store(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
 function load(k){ try { return localStorage.getItem(k) || ''; } catch(e){ return ''; } }
 function send(c, m){ try { if (c && c.open) c.send(m); } catch(e){} }
+const nextBarHTML = label => `<div class="nextbar" role="timer" aria-live="off">
+    <div class="nlabel"><span>⏭️ ${esc(label)} tra</span> <b><span id="tnum"></span> s</b></div>
+    <div class="tbar"><div id="tbar"></div></div></div>`;
 const timerHTML = () => `<div class="timer"><div class="tbar"><div id="tbar"></div></div><div id="tnum" class="tnum"></div></div>`;
 const spinner = msg => `<div class="screen center"><div class="spinner"></div><p class="lead">${esc(msg)}</p></div>`;
 function showError(msg){
@@ -970,15 +981,26 @@ function endVote(){ showWinner(cur()); }
 function showWinner(m){
   clearTimer(); score(m);
   H.phase = 'winner';
+  setTimer(AUTO.winner, showPoints);
   renderHost(); broadcast();
-  setTimer(8, showPoints, false);
+}
+// secondi prima di passare da soli alla schermata successiva
+const AUTO = {winner:8, points:14};
+// cosa arriva dopo (usato dalla barra countdown e dai pulsanti dell'host)
+function nextLabel(){
+  if (H.phase === 'winner') return 'Punti e classifica';
+  if (H.phase === 'points'){
+    if (!isLastMatch()) return 'Prossima sfida';
+    return H.round < 3 ? (H.round === 1 ? 'Round 2' : 'Round finale') : 'Classifica finale';
+  }
+  return '';
 }
 // 4) punti assegnati + classifica generale
 function showPoints(){
   clearTimer();
   H.phase = 'points';
+  setTimer(AUTO.points, nextMatch);
   renderHost(); broadcast();
-  setTimer(14, nextMatch, false);
 }
 function winnersOf(m){
   if (!m.R || m.jinx || m.novotes) return [];
@@ -1085,7 +1107,7 @@ function viewFor(p){
       if (w.includes(p.id)) mine = w.length > 1 ? 'Pareggio: sei tra i vincitori!' : 'Hai vinto la sfida!';
       else if (m.answers[p.id]) mine = 'Sfida persa… ti rifarai alla prossima!';
       const ids = answered(m).slice().sort((a, b) => (w.includes(b) - w.includes(a)) || (m.R[b].votes - m.R[a].votes));
-      return Object.assign(v, {type:'winner', title:wt.title, sub:wt.sub, mine, prompt:m.prompt,
+      return Object.assign(v, {type:'winner', next:nextLabel(), title:wt.title, sub:wt.sub, mine, prompt:m.prompt,
         cards: ids.map(id => { const a = byId(id), r = m.R[id];
           return {parts:m.answers[id], name:a.name, color:a.color, votes:r.votes, voters:r.voters, win:w.includes(id), mine:id === p.id}; })});
     }
@@ -1093,10 +1115,10 @@ function viewFor(p){
       const m = cur(), gains = {};
       answered(m).forEach(id => gains[id] = m.R[id].pts);
       const r = m.R && m.R[p.id];
-      const title = r && m.answers[p.id] ? (r.pts > 0 ? '+' + r.pts + ' punti!' : 'Zero punti in questa sfida') : 'Punti della sfida';
+      const title = r && m.answers[p.id] ? (r.pts > 0 ? '+' + r.pts + ' punti!' : 'Zero punti in questa sfida') : 'Risultati della sfida';
       const gl = answered(m).sort((a, b) => m.R[b].pts - m.R[a].pts).map(id => { const a = byId(id);
         return {name:a.name, color:a.color, votes:m.R[id].votes, pts:m.R[id].pts, cappotto:m.cappotto === id, me:id === p.id}; });
-      return Object.assign(v, {type:'board', title, gains:gl, board:boardData(p, gains)});
+      return Object.assign(v, {type:'board', next:nextLabel(), title, gains:gl, board:boardData(p, gains)});
     }
     case 'scores': return W('📊', 'Sei ' + rank(p) + '°', `Hai ${p.score} punti. Guarda la classifica sullo schermo.`);
     case 'end': {
@@ -1306,6 +1328,7 @@ VIEW.winner = () => {
     ${sub ? `<p class="lead">${sub}</p>` : ''}
     ${w.length ? `<div class="${w.length > 1 ? 'grid' : 'vs one'}">${w.map((id, i) => card(m, id, {rev:true, cls:'win big', delay:.35 + i*.15})).join('')}</div>` : ''}
     ${others.length ? `<div class="grid">${others.map((id, i) => card(m, id, {rev:true, cls:'lose', delay:.7 + i*.1})).join('')}</div>` : ''}
+    ${nextBarHTML(nextLabel())}
     <div class="row"><button class="btn" id="next">Punti e classifica ▶</button></div>
   </div>`;
   $('#next').onclick = showPoints;
@@ -1333,6 +1356,7 @@ VIEW.points = () => {
     <div class="gains">${rows}</div>
     <h2 class="huge" style="font-size:clamp(28px,4vw,52px);margin-top:10px">Classifica generale</h2>
     ${boardHTML(gains)}
+    ${nextBarHTML(nextLabel())}
     <button class="btn big" id="next">${label}</button>
   </div>`;
   $('#next').onclick = nextMatch;
@@ -1493,7 +1517,7 @@ function playerBody(v, panel){
       <p class="muted small" style="text-align:center">Tra poco si vota!</p>`;
   }
   if (v.type === 'winner'){
-    return `<div class="pbanner">${esc(v.title)}</div>
+    return `${v.next ? nextBarHTML(v.next) : ''}<div class="pbanner">${esc(v.title)}</div>
       ${v.sub ? `<p class="lead" style="text-align:center">${esc(v.sub)}</p>` : ''}
       ${v.mine ? `<div class="mymsg">${esc(v.mine)}</div>` : ''}
       <div class="opts">${v.cards.map(c => `<div class="pcard ${c.win ? 'win' : 'lose'}" style="--c:${c.color}">
@@ -1503,7 +1527,7 @@ function playerBody(v, panel){
         ${c.voters.length ? `<div class="voters">Votato da: ${c.voters.map(esc).join(', ')}</div>` : ''}</div></div>`).join('')}</div>`;
   }
   if (v.type === 'board'){
-    return `<div class="pbanner">${esc(v.title)}</div>
+    return `${v.next ? nextBarHTML(v.next) : ''}<div class="pbanner">${esc(v.title)}</div>
       ${v.sub ? `<p class="lead" style="text-align:center">${esc(v.sub)}</p>` : ''}
       ${v.gains.length ? `<h3>Punti della sfida</h3><div class="gains">${v.gains.map(g => `<div class="gain small ${g.me ? 'me' : ''}">
         <span class="aname" style="background:${g.color}">${esc(g.name)}</span>
