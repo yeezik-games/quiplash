@@ -268,11 +268,23 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
   background:transparent;color:#e9e3ff;font:700 15px Rubik,sans-serif;cursor:pointer}
 .backhome:hover,.backhome:focus-visible{background:rgba(255,255,255,.1);color:#fff;outline:none}
 .signwrap{width:100%;display:flex;flex-direction:column;align-items:center}
-.sign{width:100%;box-sizing:border-box;background:#2a1a5e;border:7px dotted var(--yellow);border-radius:28px;padding:22px 16px 26px;
-  box-shadow:0 0 0 5px #2a1a5e,0 0 44px rgba(255,210,63,.35);display:flex;flex-direction:column;align-items:center;gap:4px}
-.onair{font-weight:800;font-size:13px;letter-spacing:.26em;color:var(--cyan)}
+.sign{position:relative;width:100%;box-sizing:border-box;background:#2a1a5e;border-radius:28px;padding:30px 22px 34px;
+  box-shadow:0 0 0 9px #2a1a5e,0 0 40px rgba(255,210,63,.3);display:flex;flex-direction:column;align-items:center;gap:4px;
+  animation:signglow 2.4s ease-in-out infinite alternate}
+/* lampadine: 48 sul bordo; quelle accese (2 su 4) avanzano di una lampadina alla volta */
+.bulbs{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.bulbs rect{fill:none;stroke-width:8;stroke-linecap:round}
+.b-off{stroke:#6e5a1c;stroke-dasharray:.01 23.99}
+.b-on{stroke:var(--yellow);stroke-dasharray:.01 23.99 .01 71.99;filter:drop-shadow(0 0 4px rgba(255,210,63,.95));
+  animation:chase 1s steps(4) infinite}
+.onair{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:13px;letter-spacing:.26em;color:var(--cyan)}
+.onair::before{content:'';width:9px;height:9px;border-radius:50%;background:#ff5a5a;box-shadow:0 0 8px #ff5a5a;animation:onair 1.2s ease-in-out infinite}
+@keyframes chase{to{stroke-dashoffset:-96}}
+@keyframes signglow{from{box-shadow:0 0 0 9px #2a1a5e,0 0 26px rgba(255,210,63,.22)}to{box-shadow:0 0 0 9px #2a1a5e,0 0 58px rgba(255,210,63,.5)}}
+@keyframes onair{50%{opacity:.25}}
+@keyframes flicker{0%,18%,21%,24%,100%{opacity:1}19%,22%{opacity:.35}23%{opacity:.8}}
 .signlogo{margin:0;font-family:Bungee,sans-serif;font-weight:400;font-size:clamp(50px,15vw,64px);line-height:.98;text-align:center;color:var(--yellow);text-shadow:0 5px 0 #b8860b}
-.signlogo span{color:var(--pink);text-shadow:0 5px 0 #a3125e}
+.signlogo span{color:var(--pink);text-shadow:0 5px 0 #a3125e;display:inline-block;animation:flicker 5s linear infinite}
 .stage{width:78%;height:18px;background:#2a1a5e;border-radius:0 0 50% 50%}
 .hometag{margin:0;font-size:19px;line-height:1.4;color:#e9e3ff}
 .homebtn{display:flex;align-items:center;justify-content:center;gap:10px}
@@ -604,8 +616,13 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.14';
+const VERSION = '1.15';
 const PATCH_NOTES = [
+  {v:'1.15', date:'31 ottobre 2026', items:[
+    'Insegna della homepage animata: lampadine che si inseguono, alone che pulsa e "BUCHI" che sfarfalla come un neon',
+    'Spia rossa lampeggiante accanto a "Stasera in onda"',
+    'Le animazioni si fermano se sul telefono è attiva l\'opzione "riduci movimento"'
+  ]},
   {v:'1.14', date:'31 ottobre 2026', items:[
     'Dalla stanza appena creata l\'host può tornare alla homepage con il pulsante "Homepage"',
     'Se nella stanza c\'è già qualcuno, il gioco chiede conferma prima di chiuderla',
@@ -744,6 +761,7 @@ function home(){
   app.innerHTML = `<div class="screen center home">
     <div class="signwrap">
       <div class="sign">
+        <svg class="bulbs" aria-hidden="true"><rect class="b-off" x="0" y="0" width="100%" height="100%" rx="26" ry="26" pathLength="1152"/><rect class="b-on" x="0" y="0" width="100%" height="100%" rx="26" ry="26" pathLength="1152"/></svg>
         <span class="onair">STASERA IN ONDA</span>
         <h1 class="signlogo">TAPPA<br><span>BUCHI</span></h1>
       </div>
