@@ -579,8 +579,15 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.11';
+const VERSION = '1.12';
 const PATCH_NOTES = [
+  {v:'1.12', date:'31 ottobre 2026', items:[
+    'Se cade la connessione il telefono si ricollega da solo, con fino a 8 tentativi',
+    'Se il browser crasha o ricarichi la pagina, riaprendo il sito rientri da solo nella partita con lo stesso nome e i tuoi punti',
+    'Niente più "Nome già in uso" quando rientri dopo un crash: l\'host riconosce il tuo telefono',
+    'L\'host si accorge in pochi secondi se un giocatore è sparito e non lo aspetta per chiudere risposte e voti',
+    'Tornando sull\'app dopo averla lasciata in background, la connessione viene controllata e ripristinata subito'
+  ]},
   {v:'1.11', date:'31 ottobre 2026', items:[
     'Barra con il conto alla rovescia nelle schermate del vincitore e di punti e classifica',
     'La barra dice quale schermata arriva dopo e tra quanti secondi, se l\'host non tocca "Avanti"',
@@ -812,6 +819,7 @@ function drawBar(){
 }
 
 function hostStart(myName){
+  clearSess();
   if (typeof Peer === 'undefined') return showError('Impossibile caricare la libreria di rete. Controlla la connessione.');
   MODE = 'host';
   app.innerHTML = spinner('Creo la stanza…');
@@ -839,15 +847,24 @@ document.addEventListener('visibilitychange', () => { if (MODE === 'host' && doc
 
 function onConn(conn){
   conn.on('data', d => { try { hostMsg(conn, d); } catch(e){ console.error(e); } });
-  const lost = () => {
-    const p = H.players.find(x => x.conn === conn);
-    if (!p || !p.connected) return;
-    p.connected = false;
-    if (H.phase === 'lobby'){ H.players.splice(H.players.indexOf(p), 1); broadcast(); }
-    renderHost(); checkProgress();
-  };
+  const lost = () => { const p = H.players.find(x => x.conn === conn); if (p) markLost(p, false); };
   conn.on('close', lost); conn.on('error', lost);
 }
+// un giocatore è sparito (connessione chiusa o nessun segnale da troppo tempo)
+function markLost(p, closeIt){
+  if (!p.connected || p.conn === LOCAL) return;
+  p.connected = false;
+  if (closeIt) try { p.conn.close(); } catch(e){}
+  if (H.phase === 'lobby') H.players.splice(H.players.indexOf(p), 1);
+  broadcast(); renderHost(); checkProgress();
+}
+// controllo di presenza: chi non manda segnali da 15 secondi viene segnato come disconnesso
+const HOST_TIMEOUT = 15000;
+setInterval(() => {
+  if (MODE !== 'host') return;
+  const now = Date.now();
+  H.players.slice().forEach(p => { if (p.conn !== LOCAL && p.connected && p.seen && now - p.seen > HOST_TIMEOUT) markLost(p, true); });
+}, 3000);
 
 const byId = id => H.players.find(p => p.id === id);
 const cur = () => H.matchups[H.cur];
@@ -862,23 +879,31 @@ function hostMsg(conn, d){
   if (d.t === 'join'){
     const name = String(d.name || '').trim().replace(/\s+/g,' ').slice(0, 16);
     if (!name) return send(conn, {t:'err', msg:'Inserisci un nome.'});
-    let p = H.players.find(x => x.name.toLowerCase() === name.toLowerCase());
+    const tok = String(d.tok || '').slice(0, 64);
+    // prima cerco il dispositivo (chiave segreta), poi il nome
+    let p = (tok && H.players.find(x => x.tok === tok)) || H.players.find(x => x.name.toLowerCase() === name.toLowerCase());
     if (p){
-      if (p.connected && p.conn !== conn && p.conn && p.conn.open) return send(conn, {t:'err', msg:'Nome già in uso. Scegline un altro.'});
-      p.conn = conn; p.connected = true;
+      const sameDevice = tok && p.tok === tok;
+      if (!sameDevice && (p.conn === LOCAL || (p.connected && p.conn !== conn && p.conn && p.conn.open)))
+        return send(conn, {t:'err', msg:'Nome già in uso. Scegline un altro.'});
+      // stesso dispositivo che rientra: chiudo la vecchia connessione (magari ancora "appesa" dopo un crash)
+      if (p.conn && p.conn !== conn && p.conn !== LOCAL) try { p.conn.close(); } catch(e){}
+      p.conn = conn; p.connected = true; if (tok) p.tok = tok;
     } else {
       if (H.phase !== 'lobby') return send(conn, {t:'err', msg:'La partita è già iniziata. Aspetta la prossima!'});
       if (H.players.length >= 10) return send(conn, {t:'err', msg:'Stanza piena (massimo 10 giocatori).'});
       const used = H.players.map(x => x.color);
-      p = {id:'p' + (++H.seq), name, score:0, conn, connected:true, color: COLORS.find(c => !used.includes(c)) || COLORS[0]};
+      p = {id:'p' + (++H.seq), name, score:0, conn, connected:true, tok, color: COLORS.find(c => !used.includes(c)) || COLORS[0]};
       H.players.push(p);
     }
+    p.seen = Date.now();
     send(conn, {t:'joined', name:p.name});
-    if (H.phase === 'lobby') broadcast(); else sendView(p);
-    renderHost(); return;
+    broadcast(); renderHost(); return;
   }
   const p = H.players.find(x => x.conn === conn);
   if (!p) return;
+  p.seen = Date.now();
+  if (d.t === 'ping') return send(conn, {t:'pong'});
 
   if (d.t === 'rename'){
     const err = msg => send(conn, {t:'renameErr', msg});
@@ -1413,7 +1438,7 @@ UPD.end = () => {};
 const P = {peer:null, conn:null, name:'', code:'', joined:false, lastKey:'', localEnd:0, total:0};
 
 function joinScreen(err){
-  MODE = 'player'; window.onbeforeunload = null;
+  MODE = 'player'; window.onbeforeunload = null; document.body.dataset.mode = '';
   const qs = new URLSearchParams(location.search);
   const code = (qs.get('room') || P.code || load('tb_code') || '').toUpperCase();
   const name = P.name || load('tb_name');
@@ -1430,14 +1455,23 @@ function joinScreen(err){
     const c = $('#jcode').value.trim().toUpperCase().replace(/[^A-Z]/g, ''), n = $('#jname').value.trim();
     if (c.length !== 4){ $('#jcode').classList.add('shake'); setTimeout(() => $('#jcode') && $('#jcode').classList.remove('shake'), 400); return; }
     if (!n){ $('#jname').classList.add('shake'); setTimeout(() => $('#jname') && $('#jname').classList.remove('shake'), 400); return; }
-    P.code = c; P.name = n; store('tb_code', c); store('tb_name', n);
+    P.code = c; P.name = n; P.resuming = false; store('tb_code', c); store('tb_name', n);
     connect();
   };
   $('#jgo').onclick = go;
   $('#jname').onkeydown = e => { if (e.key === 'Enter') go(); };
-  $('#jback').onclick = () => { cleanupPlayer(); history.replaceState(null, '', location.pathname); home(); };
+  $('#jback').onclick = () => { P.stop = true; cleanupPlayer(); clearSess(); history.replaceState(null, '', location.pathname); home(); };
   if (!code) $('#jcode').focus(); else if (!name) $('#jname').focus();
 }
+
+const MAX_TRIES = 8;              // tentativi di riconnessione automatica
+const SESS_MAX = 3 * 60 * 60 * 1000; // per quanto tempo si può rientrare dopo un crash
+// chiave segreta del dispositivo: l'host riconosce chi rientra anche se la vecchia connessione sembra ancora aperta
+function myTok(){ let t = load('tb_tok'); if (!t){ t = Math.random().toString(36).slice(2) + Date.now().toString(36); store('tb_tok', t); } return t; }
+// partita in corso salvata sul telefono: serve per rientrare dopo un crash o una ricarica della pagina
+function saveSess(){ if (P.code && P.name) store('tb_sess', JSON.stringify({code:P.code, name:P.name, ts:Date.now()})); }
+function loadSess(){ try { const x = JSON.parse(load('tb_sess') || 'null'); return x && x.code && x.name && Date.now() - x.ts < SESS_MAX ? x : null; } catch(e){ return null; } }
+function clearSess(){ store('tb_sess', ''); }
 
 function cleanupPlayer(){
   const pe = P.peer;
@@ -1445,43 +1479,97 @@ function cleanupPlayer(){
   if (pe) try { pe.destroy(); } catch(e){}
 }
 
-function connect(){
+function connect(retry){
   if (typeof Peer === 'undefined') return joinScreen('Impossibile caricare la libreria di rete.');
   cleanupPlayer();
-  app.innerHTML = spinner('Mi collego alla stanza ' + P.code + '…');
+  if (!retry){ P.tries = 0; P.stop = false; app.innerHTML = spinner('Mi collego alla stanza ' + P.code + '…'); }
   const peer = new Peer(); P.peer = peer;
-  const to = setTimeout(() => { if (P.peer === peer && !P.joined){ cleanupPlayer(); joinScreen('Non riesco a collegarmi. Controlla il codice e riprova.'); } }, 15000);
+  // tentativo fallito: in riconnessione si riprova, altrimenti si torna al modulo
+  const fail = msg => {
+    if (P.peer !== peer) return;
+    clearTimeout(to); cleanupPlayer();
+    if (retry) setTimeout(autoReconnect, 2500); else joinScreen(msg);
+  };
+  const to = setTimeout(() => { if (P.peer === peer && !P.joined) fail('Non riesco a collegarmi. Controlla il codice e riprova.'); }, 12000);
   peer.on('open', () => {
     if (P.peer !== peer) return;
     const conn = peer.connect(PREFIX + P.code, {reliable:true}); P.conn = conn;
-    conn.on('open', () => conn.send({t:'join', name:P.name}));
-    conn.on('data', d => playerMsg(d, to));
-    conn.on('close', () => { if (P.conn === conn) lostConn(); });
+    conn.on('open', () => conn.send({t:'join', name:P.name, tok:myTok()}));
+    conn.on('data', d => { P.lastPong = Date.now(); playerMsg(d, to); });
+    conn.on('close', () => { if (P.conn !== conn) return; if (P.joined) lostConn(); else fail('Connessione interrotta. Riprova.'); });
   });
   peer.on('disconnected', () => { try { if (P.peer === peer) peer.reconnect(); } catch(e){} });
   peer.on('error', e => {
     if (P.peer !== peer) return;
-    clearTimeout(to);
-    if (e.type === 'peer-unavailable'){ cleanupPlayer(); joinScreen(P.joined ? 'La stanza è stata chiusa.' : 'Stanza non trovata. Controlla il codice.'); }
-    else if (!P.joined){ cleanupPlayer(); joinScreen('Errore di connessione (' + e.type + '). Riprova.'); }
+    if (e.type === 'peer-unavailable'){
+      // la stanza non esiste (più): in riconnessione riprovo una volta, poi mi arrendo
+      clearTimeout(to); cleanupPlayer();
+      if (retry && P.tries < 2) return setTimeout(autoReconnect, 1500);
+      clearSess(); P.stop = true;
+      return joinScreen(retry ? "La partita non c'è più: l'host ha chiuso la stanza." : 'Stanza non trovata. Controlla il codice.');
+    }
+    if (!P.joined) fail('Errore di connessione (' + e.type + '). Riprova.');
   });
 }
 
+// la connessione è caduta dopo essere entrati: si riprova da soli
 function lostConn(){
   if (MODE !== 'player') return;
-  cleanupPlayer();
-  app.innerHTML = `<div class="screen phone center"><div class="emoji">📡</div><h2>Connessione persa</h2>
-    <p class="lead">Rientra con lo stesso nome: riprendi da dove eri.</p>
-    <button class="btn big" id="rc">Riconnetti</button><button class="link" id="ch">Cambia stanza o nome</button></div>`;
-  $('#rc').onclick = connect;
-  $('#ch').onclick = () => joinScreen();
+  cleanupPlayer(); P.tries = 0;
+  autoReconnect();
 }
+function autoReconnect(){
+  if (MODE !== 'player' || P.stop || P.peer) return;
+  P.tries = (P.tries || 0) + 1;
+  if (P.tries > MAX_TRIES) return reconnectScreen(true);
+  reconnectScreen(false);
+  connect(true);
+}
+function reconnectScreen(gaveUp){
+  const title = gaveUp ? 'Non riesco a riconnettermi' : P.resuming ? 'Rientro nella partita' : 'Connessione persa';
+  const msg = gaveUp ? 'Controlla la connessione internet e riprova: rientrerai con lo stesso nome e riprenderai da dove eri.'
+    : `Mi sto ricollegando alla stanza <b>${esc(P.code)}</b> come <b>${esc(P.name)}</b>…`;
+  app.innerHTML = `<div class="screen phone center"><div class="emoji">${gaveUp ? '😵' : '📡'}</div><h2>${title}</h2>
+    <p class="lead">${msg}</p>
+    ${gaveUp ? '' : `<div class="spinner"></div><p class="muted small">Tentativo ${P.tries} di ${MAX_TRIES}</p>`}
+    <button class="btn big" id="rc">${gaveUp ? 'Riprova' : 'Riprova subito'}</button>
+    <button class="link" id="ch">Esci dalla partita</button></div>`;
+  document.body.dataset.mode = '';
+  $('#rc').onclick = () => { cleanupPlayer(); P.stop = false; P.tries = 0; autoReconnect(); };
+  $('#ch').onclick = () => { P.stop = true; P.resuming = false; cleanupPlayer(); clearSess(); joinScreen(); };
+}
+// riapertura della pagina dopo un crash: rientra da solo nella partita salvata
+function resumeSess(x){
+  MODE = 'player'; P.code = x.code; P.name = x.name; P.stop = false; P.tries = 0; P.resuming = true;
+  autoReconnect();
+}
+
+// controllo di presenza dal telefono: se l'host non risponde da 14 secondi, la connessione è morta
+setInterval(() => {
+  if (MODE !== 'player' || !P.joined || !P.conn) return;
+  if (Date.now() - (P.lastPong || 0) > 14000){ const c = P.conn; P.conn = null; try { c.close(); } catch(e){} return lostConn(); }
+  send(P.conn, {t:'ping'});
+}, 4000);
+// quando torni sull'app dopo averla lasciata in background: controllo subito che la connessione sia viva
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || MODE !== 'player' || P.stop || !P.code) return;
+  if (P.joined && P.conn && P.conn.open){
+    const t0 = Date.now(); send(P.conn, {t:'ping'});
+    setTimeout(() => {
+      if (MODE === 'player' && P.joined && P.conn && (P.lastPong || 0) < t0){ const c = P.conn; P.conn = null; try { c.close(); } catch(e){} lostConn(); }
+    }, 3000);
+    return;
+  }
+  if (P.peer) return;            // sta già provando a collegarsi
+  P.tries = 0; autoReconnect();
+});
 
 function playerMsg(d, to){
   if (!d || typeof d !== 'object') return;
-  if (d.t === 'err'){ clearTimeout(to); cleanupPlayer(); return joinScreen(d.msg); }
-  if (d.t === 'joined'){ clearTimeout(to); P.joined = true; P.name = d.name; return; }
-  if (d.t === 'renamed'){ P.name = d.name; store('tb_name', d.name); return; }
+  if (d.t === 'err'){ clearTimeout(to); cleanupPlayer(); clearSess(); P.stop = true; P.resuming = false; return joinScreen(d.msg); }
+  if (d.t === 'joined'){ clearTimeout(to); P.joined = true; P.name = d.name; P.tries = 0; P.resuming = false; store('tb_name', d.name); saveSess(); return; }
+  if (d.t === 'pong') return;
+  if (d.t === 'renamed'){ P.name = d.name; store('tb_name', d.name); saveSess(); return; }
   if (d.t === 'renameErr'){ const e = app.querySelector('[data-rmsg]'); if (e){ e.className = 'rmsg bad'; e.textContent = d.msg; } const b = app.querySelector('[data-rsave]'); if (b) b.disabled = false; return; }
   if (d.t === 'view') renderPlayer(d.v);
 }
@@ -1643,6 +1731,7 @@ function wirePlayer(root, v, sendFn){
 }
 
 function renderPlayer(v){
+  if (Date.now() - (P.sessTs || 0) > 30000){ P.sessTs = Date.now(); saveSess(); }
   P.localEnd = v.left ? Date.now() + v.left : 0; P.total = v.total || 0;
   const key = viewKey(v);
   if (key === P.lastKey){ updStatus(app, v); return; }
@@ -1666,7 +1755,13 @@ setInterval(() => {
 }, 200);
 
 /* ===================== AVVIO ===================== */
-if (new URLSearchParams(location.search).get('room')) joinScreen(); else home();
+(() => {
+  const room = (new URLSearchParams(location.search).get('room') || '').toUpperCase();
+  const x = loadSess();
+  if (x && (!room || room === x.code)) resumeSess(x);
+  else if (room) joinScreen();
+  else home();
+})();
 </script>
 </body>
 </html>
