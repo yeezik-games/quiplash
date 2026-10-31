@@ -9,3 +9,11 @@ Party game in stile Quiplash: riempi i buchi delle frasi, sfida un altro giocato
 - Tre round: due di sfide a coppie e un round finale con una frase uguale per tutti.
 
 Funziona senza server: i telefoni si collegano allo schermo host con [PeerJS](https://peerjs.com/).
+
+## Versione di prova
+
+- Gioco principale: https://yeezikdev.github.io/quiplash/
+- Versione di prova: https://yeezikdev.github.io/quiplash/test/
+
+Le modifiche si fanno prima in `test/index.html`. La versione di prova usa stanze separate e mostra l'etichetta "VERSIONE DI PROVA".
+Quando è tutto ok, per renderla principale basta copiare `test/index.html` su `index.html`.
