@@ -263,6 +263,28 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
 .tbarv{height:12px;background:#ece7ff;border-radius:99px;overflow:hidden;margin-top:12px}
 .tbarv div{height:100%;background:linear-gradient(90deg,var(--pink),var(--yellow));border-radius:99px;transition:width .4s}
 .tcount{font-family:Bungee,sans-serif;font-size:18px;margin-top:6px}
+.home{max-width:480px;gap:22px}
+.signwrap{width:100%;display:flex;flex-direction:column;align-items:center}
+.sign{width:100%;box-sizing:border-box;background:#2a1a5e;border:7px dotted var(--yellow);border-radius:28px;padding:22px 16px 26px;
+  box-shadow:0 0 0 5px #2a1a5e,0 0 44px rgba(255,210,63,.35);display:flex;flex-direction:column;align-items:center;gap:4px}
+.onair{font-weight:800;font-size:13px;letter-spacing:.26em;color:var(--cyan)}
+.signlogo{margin:0;font-family:Bungee,sans-serif;font-weight:400;font-size:clamp(50px,15vw,64px);line-height:.98;text-align:center;color:var(--yellow);text-shadow:0 5px 0 #b8860b}
+.signlogo span{color:var(--pink);text-shadow:0 5px 0 #a3125e}
+.stage{width:78%;height:18px;background:#2a1a5e;border-radius:0 0 50% 50%}
+.hometag{margin:0;font-size:19px;line-height:1.4;color:#e9e3ff}
+.homebtn{display:flex;align-items:center;justify-content:center;gap:10px}
+.homechips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.homechips span{border:2px solid rgba(255,255,255,.22);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:600;color:#e9e3ff}
+.howto{width:100%;display:flex;flex-direction:column;gap:16px;text-align:left;margin-top:6px}
+.howto h2{font-family:Bungee,sans-serif;font-weight:400;font-size:22px;color:#fff}
+.notesgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.hnote{color:var(--ink);border:3px solid var(--ink);border-radius:12px;padding:14px;box-shadow:4px 4px 0 rgba(0,0,0,.45);display:flex;flex-direction:column;gap:6px}
+.hnote b{font-family:Bungee,sans-serif;font-weight:400;font-size:28px;line-height:1}
+.hnote p{margin:0;font-size:15px;line-height:1.35;font-weight:600}
+.hnote.n1{background:var(--yellow);transform:rotate(-1.5deg)}
+.hnote.n2{background:var(--cyan);transform:rotate(1.5deg)}
+.hnote.n3{background:#ff8fc4;transform:rotate(1deg)}
+.hnote.n4{background:#c9bcff;transform:rotate(-1deg)}
 .spinner{width:56px;height:56px;border:6px solid rgba(255,255,255,.2);border-top-color:var(--yellow);border-radius:50%;animation:spin 1s linear infinite}
 .shake{animation:shake .35s}
 
@@ -579,8 +601,13 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.12';
+const VERSION = '1.13';
 const PATCH_NOTES = [
+  {v:'1.13', date:'31 ottobre 2026', items:[
+    'Nuova homepage: logo in un\'insegna a lampadine stile show televisivo',
+    '"Come si gioca" aggiornato e trasformato in quattro foglietti colorati',
+    'In vista le informazioni chiave: da 3 a 10 giocatori, dal telefono, senza app'
+  ]},
   {v:'1.12', date:'31 ottobre 2026', items:[
     'Se cade la connessione il telefono si ricollega da solo, con fino a 8 tentativi',
     'Se il browser crasha o ricarichi la pagina, riaprendo il sito rientri da solo nella partita con lo stesso nome e i tuoi punti',
@@ -706,23 +733,29 @@ let MODE = null;
 function home(){
   document.body.dataset.mode = '';
   MODE = null; window.onbeforeunload = null;
-  app.innerHTML = `<div class="screen center">
-    <h1 class="logo">TAPPA<span>BUCHI</span></h1>
-    <p class="tag">Riempi i buchi. Sfida un amico. Fai ridere tutti.</p>
+  app.innerHTML = `<div class="screen center home">
+    <div class="signwrap">
+      <div class="sign">
+        <span class="onair">STASERA IN ONDA</span>
+        <h1 class="signlogo">TAPPA<br><span>BUCHI</span></h1>
+      </div>
+      <div class="stage" aria-hidden="true"></div>
+    </div>
+    <p class="hometag">Riempi i buchi. Sfida un amico.<br>Fai ridere tutti.</p>
     <div class="stack">
-      <button class="btn big" id="bHost">📺 Crea una partita</button>
-      <button class="btn big alt" id="bJoin">📱 Entra con il telefono</button>
+      <button class="btn big homebtn" id="bHost"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Crea una partita</button>
+      <button class="btn big alt homebtn" id="bJoin"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Entra con un codice</button>
     </div>
-    <div class="how card">
-      <h3>Come si gioca</h3>
-      <ol>
-        <li>Apri la partita su un PC o una TV: sarà lo schermo comune.</li>
-        <li>Ognuno entra dal proprio telefono con il codice stanza (o il QR).</li>
-        <li>Riempi i buchi delle frasi: ogni frase ce l'ha anche un altro giocatore.</li>
-        <li>Le due risposte si sfidano e tutti gli altri votano la migliore.</li>
-        <li>Tre round, l'ultimo con una frase per tutti. Vince chi fa più punti!</li>
-      </ol>
-    </div>
+    <div class="homechips"><span>3–10 giocatori</span><span>Dal telefono</span><span>Senza app</span></div>
+    <section class="howto">
+      <h2>Come si gioca</h2>
+      <div class="notesgrid">
+        <div class="hnote n1"><b>1</b><p>Crea la stanza e invita gli amici col codice.</p></div>
+        <div class="hnote n2"><b>2</b><p>Riempi i buchi con la risposta più divertente.</p></div>
+        <div class="hnote n3"><b>3</b><p>Le risposte si sfidano: gli altri votano.</p></div>
+        <div class="hnote n4"><b>4</b><p>Tre round e classifica: vince chi fa ridere.</p></div>
+      </div>
+    </section>
   </div>`;
   $('#bHost').onclick = hostSetup;
   $('#bJoin').onclick = () => joinScreen();
