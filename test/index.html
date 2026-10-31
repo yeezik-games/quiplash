@@ -622,83 +622,55 @@ if (IS_TEST){
 const VERSION = '1.16';
 const PATCH_NOTES = [
   {v:'1.16', date:'31 ottobre 2026', items:[
-    'L\'insegna animata compare anche in "Crea una partita", nella stanza dell\'host e in "Entra con un codice"',
-    'Tolta la scritta "Stasera in onda" dall\'insegna',
-    'Corretto: l\'insegna non si animava su alcuni computer e browser (impostazione "riduci movimento", Safari)'
+    'Insegna animata anche nelle altre schermate, su tutti i browser'
   ]},
   {v:'1.15', date:'31 ottobre 2026', items:[
-    'Insegna della homepage animata: lampadine che si inseguono, alone che pulsa e "BUCHI" che sfarfalla come un neon'
+    'Insegna della homepage animata, con le lampadine che si accendono a turno'
   ]},
   {v:'1.14', date:'31 ottobre 2026', items:[
-    'Dalla stanza appena creata l\'host può tornare alla homepage con il pulsante "Homepage"',
-    'Se nella stanza c\'è già qualcuno, il gioco chiede conferma prima di chiuderla',
-    'I giocatori entrati vengono avvisati subito che l\'host ha chiuso la stanza'
+    'L\'host può tornare alla homepage dalla stanza'
   ]},
   {v:'1.13', date:'31 ottobre 2026', items:[
-    'Nuova homepage: logo in un\'insegna a lampadine stile show televisivo',
-    '"Come si gioca" aggiornato e trasformato in quattro foglietti colorati',
-    'In vista le informazioni chiave: da 3 a 10 giocatori, dal telefono, senza app'
+    'Nuova homepage'
   ]},
   {v:'1.12', date:'31 ottobre 2026', items:[
-    'Se cade la connessione il telefono si ricollega da solo, con fino a 8 tentativi',
-    'Se il browser crasha o ricarichi la pagina, riaprendo il sito rientri da solo nella partita con lo stesso nome e i tuoi punti',
-    'Niente più "Nome già in uso" quando rientri dopo un crash: l\'host riconosce il tuo telefono',
-    'L\'host si accorge in pochi secondi se un giocatore è sparito e non lo aspetta per chiudere risposte e voti',
-    'Tornando sull\'app dopo averla lasciata in background, la connessione viene controllata e ripristinata subito'
+    'Riconnessione automatica: dopo un crash rientri da solo nella partita'
   ]},
   {v:'1.11', date:'31 ottobre 2026', items:[
-    'Barra con il conto alla rovescia nelle schermate del vincitore e di punti e classifica',
-    'La barra dice quale schermata arriva dopo e tra quanti secondi, se l\'host non tocca "Avanti"',
-    'Il conto alla rovescia sta in un riquadro fisso in basso a destra, allineato al resto della pagina',
-    'Per l\'host il conto alla rovescia e il pulsante "Vai subito" stanno nella stessa barra, sempre visibile in fondo'
+    'Conto alla rovescia prima della schermata successiva'
   ]},
   {v:'1.10', date:'31 ottobre 2026', items:[
-    'Nella lobby ogni giocatore, host compreso, può cambiare il proprio nome',
-    'Il cambio nome funziona prima della prima partita e tra una partita e l\'altra',
-    'Non si può scegliere un nome già usato da un altro giocatore'
+    'Puoi cambiare nome nella lobby'
   ]},
   {v:'1.9', date:'31 ottobre 2026', items:[
-    'Oltre 200 frasi nuove: ora sono più di 270 in tutto',
-    'Nuovi temi: casa, famiglia, amore, lavoro e scuola, cibo, tecnologia, animali, Halloween, fantasy, storia, sport, musica e TV, viaggi, notizie assurde',
-    'Le frasi già uscite non si ripetono più, nemmeno ricaricando la pagina o creando una nuova partita, finché non sono uscite tutte'
+    'Oltre 270 frasi, che non si ripetono'
   ]},
   {v:'1.8', date:'31 ottobre 2026', items:[
-    'Versione del gioco visibile in fondo alla pagina',
-    'Toccando la versione si aprono queste patch notes',
-    'Nuova versione di prova separata dal gioco principale'
+    'Arrivano le patch notes'
   ]},
   {v:'1.7', date:'19 ottobre 2026', items:[
-    'Durante la scrittura vedi nome per nome chi sta ancora scrivendo e chi ha finito',
-    'Per chi sta scrivendo è indicato a che frase è arrivato (es. 1/2 frasi)',
-    'L\'elenco si aggiorna in tempo reale senza cancellare quello che stai scrivendo'
+    'Vedi chi sta ancora scrivendo e chi ha finito'
   ]},
   {v:'1.6', date:'19 ottobre 2026', items:[
-    'Schermate ben distinte durante la votazione: "Tocca a te votare" in azzurro e "È la tua sfida" in rosa',
-    'Le risposte da votare hanno una lettera (A, B…) e si illuminano quando le scegli'
+    'Schermate diverse per chi vota e per chi è in sfida'
   ]},
   {v:'1.5', date:'19 ottobre 2026', items:[
-    'L\'host gioca con le stesse schermate di tutti gli altri giocatori',
-    'Nuovo pulsante "Invita amici" nella lobby',
-    'Barra "Comandi host" per far avanzare la partita senza aspettare i timer',
-    'Le risposte e l\'intro dei round compaiono su ogni telefono'
+    'L\'host gioca con le stesse schermate degli altri e può invitare gli amici'
   ]},
   {v:'1.4', date:'19 ottobre 2026', items:[
-    'Vincitore della sfida e classifica generale visibili su tutti i telefoni',
-    'Classifica finale con la tua posizione a fine partita'
+    'Vincitore e classifica su tutti i telefoni'
   ]},
   {v:'1.3', date:'19 ottobre 2026', items:[
-    'Chi è in sfida vede i voti arrivare in tempo reale, senza poter votare',
-    'Tempo di votazione di 10 secondi, modificabile nelle impostazioni'
+    'Chi è in sfida vede i voti in tempo reale'
   ]},
   {v:'1.2', date:'19 ottobre 2026', items:[
-    'Nuovo flusso di ogni sfida: risposte una alla volta, votazione, vincitore, punti e classifica'
+    'Ogni sfida: risposte, voto, vincitore e classifica'
   ]},
   {v:'1.1', date:'19 ottobre 2026', items:[
-    'Chi crea la stanza può giocare dallo stesso dispositivo'
+    'Chi crea la stanza può giocare'
   ]},
   {v:'1.0', date:'19 ottobre 2026', items:[
-    'Prima versione di Tappabuchi: frasi con 1 o 2 buchi, sfide a coppie, votazione e 3 round',
-    'Si gioca dal telefono con codice stanza o QR, senza installare nulla'
+    'Prima versione di Tappabuchi'
   ]}
 ];
 
