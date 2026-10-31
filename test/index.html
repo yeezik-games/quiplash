@@ -268,7 +268,7 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
   background:transparent;color:#e9e3ff;font:700 15px Rubik,sans-serif;cursor:pointer}
 .backhome:hover,.backhome:focus-visible{background:rgba(255,255,255,.1);color:#fff;outline:none}
 .signwrap{width:100%;display:flex;flex-direction:column;align-items:center}
-.sign{position:relative;width:100%;box-sizing:border-box;background:#2a1a5e;border-radius:28px;padding:30px 22px 34px;
+.sign{position:relative;width:100%;box-sizing:border-box;background:#2a1a5e;border-radius:28px;padding:30px 22px 32px;
   box-shadow:0 0 0 9px #2a1a5e,0 0 40px rgba(255,210,63,.3);display:flex;flex-direction:column;align-items:center;gap:4px;
   animation:signglow 2.4s ease-in-out infinite alternate}
 /* lampadine: 48 sul bordo; quelle accese (2 su 4) avanzano di una lampadina alla volta */
@@ -277,19 +277,15 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
 .b-off{stroke:#6e5a1c;stroke-dasharray:.01 23.99}
 .b-on{stroke:var(--yellow);stroke-dasharray:.01 23.99 .01 71.99;filter:drop-shadow(0 0 4px rgba(255,210,63,.95));
   animation:chase 1s steps(4) infinite}
-.onair{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:13px;letter-spacing:.26em;color:var(--cyan)}
-.onair::before{content:'';width:9px;height:9px;border-radius:50%;background:#ff5a5a;box-shadow:0 0 8px #ff5a5a;animation:onair 1.2s ease-in-out infinite}
 @keyframes chase{to{stroke-dashoffset:-96}}
 @keyframes signglow{from{box-shadow:0 0 0 9px #2a1a5e,0 0 26px rgba(255,210,63,.22)}to{box-shadow:0 0 0 9px #2a1a5e,0 0 58px rgba(255,210,63,.5)}}
-@keyframes onair{50%{opacity:.25}}
 @keyframes flicker{0%,18%,21%,24%,100%{opacity:1}19%,22%{opacity:.35}23%{opacity:.8}}
 .signlogo{margin:0;font-family:Bungee,sans-serif;font-weight:400;font-size:clamp(50px,15vw,64px);line-height:.98;text-align:center;color:var(--yellow);text-shadow:0 5px 0 #b8860b}
 .signlogo span{color:var(--pink);text-shadow:0 5px 0 #a3125e;display:inline-block;animation:flicker 5s linear infinite}
 .stage{width:78%;height:18px;background:#2a1a5e;border-radius:0 0 50% 50%}
 .signwrap.compact{max-width:340px;margin:6px auto 0}
-.signwrap.compact .sign{padding:20px 18px 22px;border-radius:24px}
+.signwrap.compact .sign{padding:22px 18px 24px;border-radius:24px}
 .signwrap.compact .signlogo{font-size:clamp(36px,11vw,46px)}
-.signwrap.compact .onair{font-size:11px}
 .signwrap.compact .stage{height:12px}
 .lobbyL .signwrap.compact{margin:6px 0 0}
 .hometag{margin:0;font-size:19px;line-height:1.4;color:#e9e3ff}
@@ -625,11 +621,11 @@ if (IS_TEST){
 const VERSION = '1.16';
 const PATCH_NOTES = [
   {v:'1.16', date:'31 ottobre 2026', items:[
-    'L\'insegna animata compare anche in "Crea una partita", nella stanza dell\'host e in "Entra con un codice"'
+    'L\'insegna animata compare anche in "Crea una partita", nella stanza dell\'host e in "Entra con un codice"',
+    'Tolta la scritta "Stasera in onda" dall\'insegna'
   ]},
   {v:'1.15', date:'31 ottobre 2026', items:[
     'Insegna della homepage animata: lampadine che si inseguono, alone che pulsa e "BUCHI" che sfarfalla come un neon',
-    'Spia rossa lampeggiante accanto a "Stasera in onda"',
     'Le animazioni si fermano se sul telefono è attiva l\'opzione "riduci movimento"'
   ]},
   {v:'1.14', date:'31 ottobre 2026', items:[
@@ -769,7 +765,6 @@ function signHTML(compact){
   return `<div class="signwrap${compact ? ' compact' : ''}">
       <div class="sign">
         <svg class="bulbs" aria-hidden="true"><rect class="b-off" x="0" y="0" width="100%" height="100%" rx="26" ry="26" pathLength="1152"/><rect class="b-on" x="0" y="0" width="100%" height="100%" rx="26" ry="26" pathLength="1152"/></svg>
-        <span class="onair">STASERA IN ONDA</span>
         <h1 class="signlogo">TAPPA<br><span>BUCHI</span></h1>
       </div>
       <div class="stage" aria-hidden="true"></div>
