@@ -171,6 +171,19 @@ input:focus,select:focus,textarea:focus{border-color:var(--pink);outline:none}
 .nlabel{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800;font-size:15px;line-height:1.2}
 .nlabel b{font-family:Bungee,sans-serif;font-size:18px;color:var(--yellow);white-space:nowrap}
 .nextbar .tbar{flex:none;height:8px}
+/* barra dell'host: tempo + pulsante affiancati, resta attaccata in fondo mentre scorri */
+.hbar.hnext{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom));z-index:40;border-top:0;
+  background:#2d2353;border-radius:14px;padding:12px 14px;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);animation:slideup .35s both}
+.hbar.hnext.wide{width:100%;max-width:700px;margin:0 auto}
+.hcd{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;text-align:left}
+.hcd .tbar{flex:none;height:8px}
+.hnext .btn{flex:none;white-space:nowrap}
+/* due righe: sopra "prossima schermata + secondi", sotto barra + pulsante */
+.hbar.hnext{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:14px;row-gap:8px}
+.hnext .hcd{display:contents}
+.hnext .nlabel{grid-column:1 / -1}
+.hnext .tbar{grid-column:1;grid-row:2}
+.hnext .btn{grid-column:2;grid-row:2}
 /* spazio in fondo alla pagina perché il riquadro non copra niente quando scorri fino in fondo */
 body:has(.nextbar) .vfoot{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 @keyframes slideup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
@@ -571,7 +584,8 @@ const PATCH_NOTES = [
   {v:'1.11', date:'31 ottobre 2026', items:[
     'Barra con il conto alla rovescia nelle schermate del vincitore e di punti e classifica',
     'La barra dice quale schermata arriva dopo e tra quanti secondi, se l\'host non tocca "Avanti"',
-    'Il conto alla rovescia sta in un riquadro fisso in basso a destra'
+    'Il conto alla rovescia sta in un riquadro fisso in basso a destra, allineato al resto della pagina',
+    'Per l\'host il conto alla rovescia e il pulsante "Vai subito" stanno nella stessa barra, sempre visibile in fondo'
   ]},
   {v:'1.10', date:'31 ottobre 2026', items:[
     'Nella lobby ogni giocatore, host compreso, può cambiare il proprio nome',
@@ -669,6 +683,8 @@ function load(k){ try { return localStorage.getItem(k) || ''; } catch(e){ return
 function send(c, m){ try { if (c && c.open) c.send(m); } catch(e){} }
 const nextBarHTML = label => `<div class="nextbar" role="timer" aria-live="off">
     <div class="nlabel"><span>⏭️ ${esc(label)} tra</span> <b><span id="tnum"></span> s</b></div>
+    <div class="tbar"><div id="tbar"></div></div></div>`;
+const hostCdHTML = label => `<div class="hcd"><div class="nlabel"><span>⏭️ ${esc(label)}</span> <b><span id="tnum"></span> s</b></div>
     <div class="tbar"><div id="tbar"></div></div></div>`;
 const timerHTML = () => `<div class="timer"><div class="tbar"><div id="tbar"></div></div><div id="tnum" class="tnum"></div></div>`;
 const spinner = msg => `<div class="screen center"><div class="spinner"></div><p class="lead">${esc(msg)}</p></div>`;
@@ -768,7 +784,7 @@ function drawHP(){
   if (el.dataset.key === key){ updStatus(el, v); return; }
   el.dataset.key = key;
   el.innerHTML = `<div class="ptop"><span class="dot" style="background:${v.color}"></span><b>👑 ${esc(v.name)}</b><span class="pill" style="margin-left:6px">Stanza ${H.code}</span><span class="pscore">${v.score} pt</span></div>`
-               + playerBody(v, false);
+               + playerBody(Object.assign({}, v, {next:''}), false);
   setMode(v);
   wirePlayer(el, v, d => hostMsg(LOCAL, d));
 }
@@ -787,7 +803,11 @@ function drawBar(){
   const k = H.phase + '|' + H.cur + '|' + (b ? b[0] : '');
   if (el.dataset.key === k) return;
   el.dataset.key = k;
-  el.innerHTML = b ? `<span class="muted small">Comandi host</span><button class="btn small ${H.phase === 'end' ? '' : 'ghost'}" id="hb">${b[0]}</button>` : '';
+  const cd = (H.phase === 'winner' || H.phase === 'points') && H.timerEnd;
+  el.classList.toggle('hnext', !!cd);
+  el.innerHTML = !b ? '' : cd
+    ? `${hostCdHTML(nextLabel())}<button class="btn small" id="hb">Vai subito ▶</button>`
+    : `<span class="muted small">Comandi host</span><button class="btn small ${H.phase === 'end' ? '' : 'ghost'}" id="hb">${b[0]}</button>`;
   if (b) $('#hb').onclick = b[1];
 }
 
@@ -1338,8 +1358,7 @@ VIEW.winner = () => {
     ${sub ? `<p class="lead">${sub}</p>` : ''}
     ${w.length ? `<div class="${w.length > 1 ? 'grid' : 'vs one'}">${w.map((id, i) => card(m, id, {rev:true, cls:'win big', delay:.35 + i*.15})).join('')}</div>` : ''}
     ${others.length ? `<div class="grid">${others.map((id, i) => card(m, id, {rev:true, cls:'lose', delay:.7 + i*.1})).join('')}</div>` : ''}
-    ${nextBarHTML(nextLabel())}
-    <div class="row"><button class="btn" id="next">Punti e classifica ▶</button></div>
+    <div class="hbar hnext wide">${hostCdHTML(nextLabel())}<button class="btn" id="next">Vai subito ▶</button></div>
   </div>`;
   $('#next').onclick = showPoints;
 };
@@ -1366,8 +1385,7 @@ VIEW.points = () => {
     <div class="gains">${rows}</div>
     <h2 class="huge" style="font-size:clamp(28px,4vw,52px);margin-top:10px">Classifica generale</h2>
     ${boardHTML(gains)}
-    ${nextBarHTML(nextLabel())}
-    <button class="btn big" id="next">${label}</button>
+    <div class="hbar hnext wide">${hostCdHTML(nextLabel())}<button class="btn" id="next">Vai subito ▶</button></div>
   </div>`;
   $('#next').onclick = nextMatch;
 };
