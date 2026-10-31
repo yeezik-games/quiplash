@@ -161,10 +161,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--pink);outline:none}
 .rmsg.ok{color:#9ef08c}
 .rmsg.bad{color:#ffb4b4}
 [data-players] .chip{animation:none}
-.nextbar{display:flex;flex-direction:column;gap:6px;width:100%;max-width:700px;margin:0 auto;background:rgba(255,255,255,.08);border-radius:14px;padding:10px 14px}
-.nlabel{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-weight:700;font-size:15px}
-.nlabel b{font-family:Bungee,sans-serif;font-size:20px;color:var(--yellow);white-space:nowrap}
-.nextbar .tbar{flex:none;height:10px}
+.nextbar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:50;width:min(260px,calc(100vw - 32px));
+  display:flex;flex-direction:column;gap:6px;background:rgba(27,15,59,.92);border:2px solid rgba(255,255,255,.18);border-radius:16px;padding:10px 12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:slideup .35s both}
+.nlabel{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;font-size:14px;line-height:1.2}
+.nlabel b{font-family:Bungee,sans-serif;font-size:18px;color:var(--yellow);white-space:nowrap}
+.nextbar .tbar{flex:none;height:8px}
+/* sul telefono: spazio in fondo alla pagina perché il riquadro non copra niente quando scorri fino in fondo */
+@media (max-width:700px){body:has(.nextbar) .vfoot{padding-bottom:calc(96px + env(safe-area-inset-bottom))}}
+@keyframes slideup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 #app .screen{min-height:calc(100vh - 44px);min-height:calc(100dvh - 44px)}
 .vfoot{display:flex;justify-content:center;padding:8px 16px 14px}
 .vbtn{background:none;border:0;color:var(--muted);font:600 13px Rubik,sans-serif;cursor:pointer;padding:6px 10px;border-radius:99px}
@@ -561,7 +566,8 @@ const VERSION = '1.11';
 const PATCH_NOTES = [
   {v:'1.11', date:'31 ottobre 2026', items:[
     'Barra con il conto alla rovescia nelle schermate del vincitore e di punti e classifica',
-    'La barra dice quale schermata arriva dopo e tra quanti secondi, se l\'host non tocca "Avanti"'
+    'La barra dice quale schermata arriva dopo e tra quanti secondi, se l\'host non tocca "Avanti"',
+    'Il conto alla rovescia sta in un riquadro fisso in basso a destra'
   ]},
   {v:'1.10', date:'31 ottobre 2026', items:[
     'Nella lobby ogni giocatore, host compreso, può cambiare il proprio nome',
