@@ -286,6 +286,12 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
 .signlogo{margin:0;font-family:Bungee,sans-serif;font-weight:400;font-size:clamp(50px,15vw,64px);line-height:.98;text-align:center;color:var(--yellow);text-shadow:0 5px 0 #b8860b}
 .signlogo span{color:var(--pink);text-shadow:0 5px 0 #a3125e;display:inline-block;animation:flicker 5s linear infinite}
 .stage{width:78%;height:18px;background:#2a1a5e;border-radius:0 0 50% 50%}
+.signwrap.compact{max-width:340px;margin:6px auto 0}
+.signwrap.compact .sign{padding:20px 18px 22px;border-radius:24px}
+.signwrap.compact .signlogo{font-size:clamp(36px,11vw,46px)}
+.signwrap.compact .onair{font-size:11px}
+.signwrap.compact .stage{height:12px}
+.lobbyL .signwrap.compact{margin:6px 0 0}
 .hometag{margin:0;font-size:19px;line-height:1.4;color:#e9e3ff}
 .homebtn{display:flex;align-items:center;justify-content:center;gap:10px}
 .homechips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
@@ -616,8 +622,11 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.15';
+const VERSION = '1.16';
 const PATCH_NOTES = [
+  {v:'1.16', date:'31 ottobre 2026', items:[
+    'L\'insegna animata compare anche in "Crea una partita", nella stanza dell\'host e in "Entra con un codice"'
+  ]},
   {v:'1.15', date:'31 ottobre 2026', items:[
     'Insegna della homepage animata: lampadine che si inseguono, alone che pulsa e "BUCHI" che sfarfalla come un neon',
     'Spia rossa lampeggiante accanto a "Stasera in onda"',
@@ -755,18 +764,22 @@ function showError(msg){
 let MODE = null;
 
 /* ===================== HOME ===================== */
-function home(){
-  document.body.dataset.mode = '';
-  MODE = null; window.onbeforeunload = null;
-  app.innerHTML = `<div class="screen center home">
-    <div class="signwrap">
+// insegna animata del gioco: la stessa in homepage e nelle altre schermate
+function signHTML(compact){
+  return `<div class="signwrap${compact ? ' compact' : ''}">
       <div class="sign">
         <svg class="bulbs" aria-hidden="true"><rect class="b-off" x="0" y="0" width="100%" height="100%" rx="26" ry="26" pathLength="1152"/><rect class="b-on" x="0" y="0" width="100%" height="100%" rx="26" ry="26" pathLength="1152"/></svg>
         <span class="onair">STASERA IN ONDA</span>
         <h1 class="signlogo">TAPPA<br><span>BUCHI</span></h1>
       </div>
       <div class="stage" aria-hidden="true"></div>
-    </div>
+    </div>`;
+}
+function home(){
+  document.body.dataset.mode = '';
+  MODE = null; window.onbeforeunload = null;
+  app.innerHTML = `<div class="screen center home">
+    ${signHTML()}
     <p class="hometag">Riempi i buchi. Sfida un amico.<br>Fai ridere tutti.</p>
     <div class="stack">
       <button class="btn big homebtn" id="bHost"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Crea una partita</button>
@@ -800,7 +813,7 @@ function genCode(){ const L = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; let c = ''; for (let i
 function hostSetup(){
   MODE = null;
   app.innerHTML = `<div class="screen phone center">
-    <h1 class="logo sm">TAPPA<span>BUCHI</span></h1>
+    ${signHTML(true)}
     <div class="card form">
       <h3>Crea una partita</h3>
       <label>Il tuo nome<input id="hname" maxlength="16" autocomplete="off" value="${esc(load('tb_name'))}" placeholder="Es. Pietro"></label>
@@ -1292,7 +1305,7 @@ VIEW.lobby = () => {
   app.innerHTML = `<div class="screen host"><div class="lobby">
     <div class="lobbyL">
       <button class="backhome" id="toHome"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Homepage</button>
-      <h1 class="logo sm">TAPPA<span>BUCHI</span></h1>
+      ${signHTML(true)}
       <p class="lead" style="margin:0">Entra dal telefono: inquadra il QR o apri questo sito e inserisci il codice.</p>
       <div class="joinbox">
         <div id="qr"></div>
@@ -1520,7 +1533,7 @@ function joinScreen(err){
   const code = (qs.get('room') || P.code || load('tb_code') || '').toUpperCase();
   const name = P.name || load('tb_name');
   app.innerHTML = `<div class="screen phone center">
-    <h1 class="logo sm">TAPPA<span>BUCHI</span></h1>
+    ${signHTML(true)}
     <div class="card form">
       ${err ? `<div class="err">${esc(err)}</div>` : ''}
       <label>Codice stanza<input id="jcode" maxlength="4" autocomplete="off" autocapitalize="characters" value="${esc(code)}" placeholder="ABCD"></label>
