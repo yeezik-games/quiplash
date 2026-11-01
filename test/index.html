@@ -621,9 +621,12 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.16';
+const VERSION = '1.17';
 // Un blocco per giorno (il più recente in cima). Aggiornamento nello stesso giorno: aggiungi la riga in cima al blocco e alza "to".
 const PATCH_NOTES = [
+  {date:'1 novembre 2026', from:'1.17', to:'1.17', items:[
+    'Tutte le novità diventano ufficiali'
+  ]},
   {date:'31 ottobre 2026', from:'1.8', to:'1.16', items:[
     'Nuova homepage con l\'insegna animata, anche nelle altre schermate',
     'Riconnessione automatica: dopo un crash rientri da solo nella partita',
@@ -906,7 +909,7 @@ const HOST_TIMEOUT = 15000;
 setInterval(() => {
   if (MODE !== 'host') return;
   const now = Date.now();
-  H.players.slice().forEach(p => { if (p.conn !== LOCAL && p.connected && p.seen && now - p.seen > HOST_TIMEOUT) markLost(p, true); });
+  H.players.slice().forEach(p => { if (p.conn !== LOCAL && p.connected && p.hb && p.seen && now - p.seen > HOST_TIMEOUT) markLost(p, true); });
 }, 3000);
 
 const byId = id => H.players.find(p => p.id === id);
@@ -946,7 +949,7 @@ function hostMsg(conn, d){
   const p = H.players.find(x => x.conn === conn);
   if (!p) return;
   p.seen = Date.now();
-  if (d.t === 'ping') return send(conn, {t:'pong'});
+  if (d.t === 'ping'){ p.hb = true; return send(conn, {t:'pong'}); }
 
   if (d.t === 'rename'){
     const err = msg => send(conn, {t:'renameErr', msg});
@@ -1530,13 +1533,13 @@ const SESS_MAX = 3 * 60 * 60 * 1000; // per quanto tempo si può rientrare dopo 
 // chiave segreta del dispositivo: l'host riconosce chi rientra anche se la vecchia connessione sembra ancora aperta
 function myTok(){ let t = load('tb_tok'); if (!t){ t = Math.random().toString(36).slice(2) + Date.now().toString(36); store('tb_tok', t); } return t; }
 // partita in corso salvata sul telefono: serve per rientrare dopo un crash o una ricarica della pagina
-function saveSess(){ if (P.code && P.name) store('tb_sess', JSON.stringify({code:P.code, name:P.name, ts:Date.now()})); }
-function loadSess(){ try { const x = JSON.parse(load('tb_sess') || 'null'); return x && x.code && x.name && Date.now() - x.ts < SESS_MAX ? x : null; } catch(e){ return null; } }
+function saveSess(){ if (P.code && P.name) store('tb_sess', JSON.stringify({code:P.code, name:P.name, ts:Date.now(), pre:PREFIX})); }
+function loadSess(){ try { const x = JSON.parse(load('tb_sess') || 'null'); return x && x.code && x.name && x.pre === PREFIX && Date.now() - x.ts < SESS_MAX ? x : null; } catch(e){ return null; } }
 function clearSess(){ store('tb_sess', ''); }
 
 function cleanupPlayer(){
   const pe = P.peer;
-  P.conn = null; P.peer = null; P.joined = false; P.lastKey = '';
+  P.conn = null; P.peer = null; P.joined = false; P.lastKey = ''; P.hbOK = false;
   if (pe) try { pe.destroy(); } catch(e){}
 }
 
@@ -1608,7 +1611,7 @@ function resumeSess(x){
 // controllo di presenza dal telefono: se l'host non risponde da 14 secondi, la connessione è morta
 setInterval(() => {
   if (MODE !== 'player' || !P.joined || !P.conn) return;
-  if (Date.now() - (P.lastPong || 0) > 14000){ const c = P.conn; P.conn = null; try { c.close(); } catch(e){} return lostConn(); }
+  if (P.hbOK && Date.now() - (P.lastPong || 0) > 14000){ const c = P.conn; P.conn = null; try { c.close(); } catch(e){} return lostConn(); }
   send(P.conn, {t:'ping'});
 }, 4000);
 // quando torni sull'app dopo averla lasciata in background: controllo subito che la connessione sia viva
@@ -1617,7 +1620,7 @@ document.addEventListener('visibilitychange', () => {
   if (P.joined && P.conn && P.conn.open){
     const t0 = Date.now(); send(P.conn, {t:'ping'});
     setTimeout(() => {
-      if (MODE === 'player' && P.joined && P.conn && (P.lastPong || 0) < t0){ const c = P.conn; P.conn = null; try { c.close(); } catch(e){} lostConn(); }
+      if (MODE === 'player' && P.joined && P.hbOK && P.conn && (P.lastPong || 0) < t0){ const c = P.conn; P.conn = null; try { c.close(); } catch(e){} lostConn(); }
     }, 3000);
     return;
   }
@@ -1629,7 +1632,7 @@ function playerMsg(d, to){
   if (!d || typeof d !== 'object') return;
   if (d.t === 'err'){ clearTimeout(to); cleanupPlayer(); clearSess(); P.stop = true; P.resuming = false; return joinScreen(d.msg); }
   if (d.t === 'joined'){ clearTimeout(to); P.joined = true; P.name = d.name; P.tries = 0; P.resuming = false; store('tb_name', d.name); saveSess(); return; }
-  if (d.t === 'pong') return;
+  if (d.t === 'pong'){ P.hbOK = true; return; }
   if (d.t === 'closed'){ clearTimeout(to); P.stop = true; P.resuming = false; cleanupPlayer(); clearSess(); return joinScreen("L'host ha chiuso la stanza. Chiedigli il nuovo codice per rientrare."); }
   if (d.t === 'renamed'){ P.name = d.name; store('tb_name', d.name); saveSess(); return; }
   if (d.t === 'renameErr'){ const e = app.querySelector('[data-rmsg]'); if (e){ e.className = 'rmsg bad'; e.textContent = d.msg; } const b = app.querySelector('[data-rsave]'); if (b) b.disabled = false; return; }

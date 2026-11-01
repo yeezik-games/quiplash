@@ -149,6 +149,67 @@ input:focus,select:focus,textarea:focus{border-color:var(--pink);outline:none}
 .tag{background:var(--pink);color:#fff;border-radius:99px;padding:3px 10px;font-size:14px;font-weight:800}
 .delta{color:#7ee36b;font-size:15px}
 .opt.tally{cursor:default}
+.rename{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;max-width:420px;margin:6px auto}
+.rename.host{align-items:stretch;max-width:520px;background:rgba(255,255,255,.08);border-radius:16px;padding:12px 14px;margin:0}
+.rcur{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;font-size:17px}
+.rform{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%}
+.rform[hidden],.rcur[hidden]{display:none}
+.rrow{display:flex;gap:8px;width:100%}
+.rrow input{flex:1;min-width:0;padding:10px 12px;font-size:17px}
+.rlabel{font-weight:700;font-size:14px;color:var(--muted)}
+.rmsg{min-height:1.2em;font-weight:700;font-size:14px}
+.rmsg.ok{color:#9ef08c}
+.rmsg.bad{color:#ffb4b4}
+[data-players] .chip{animation:none}
+.screen{--colw:1200px}
+.screen.phone{--colw:520px}
+/* riquadro fisso, allineato al bordo destro della colonna dei contenuti (non dello schermo) */
+.nextbar{position:fixed;z-index:50;bottom:calc(16px + env(safe-area-inset-bottom));
+  right:max(16px, calc(50% - var(--colw) / 2 + 16px));width:min(260px, calc(100% - 32px));
+  display:flex;flex-direction:column;gap:8px;background:#2d2353;border-radius:14px;padding:12px 14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);animation:slideup .35s both}
+.nlabel{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800;font-size:15px;line-height:1.2}
+.nlabel b{font-family:Bungee,sans-serif;font-size:18px;color:var(--yellow);white-space:nowrap}
+.nextbar .tbar{flex:none;height:8px}
+/* barra dell'host: tempo + pulsante affiancati, resta attaccata in fondo mentre scorri */
+.hbar.hnext{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom));z-index:40;border-top:0;
+  background:#2d2353;border-radius:14px;padding:12px 14px;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);animation:slideup .35s both}
+.hbar.hnext.wide{width:100%;max-width:700px;margin:0 auto}
+.hcd{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;text-align:left}
+.hcd .tbar{flex:none;height:8px}
+.hnext .btn{flex:none;white-space:nowrap}
+/* due righe: sopra "prossima schermata + secondi", sotto barra + pulsante */
+.hbar.hnext{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:14px;row-gap:8px}
+.hnext .hcd{display:contents}
+.hnext .nlabel{grid-column:1 / -1}
+.hnext .tbar{grid-column:1;grid-row:2}
+.hnext .btn{grid-column:2;grid-row:2}
+/* spazio in fondo alla pagina perché il riquadro non copra niente quando scorri fino in fondo */
+body:has(.nextbar) .vfoot{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+@keyframes slideup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+#app .screen{min-height:calc(100vh - 44px);min-height:calc(100dvh - 44px)}
+.vfoot{display:flex;justify-content:center;padding:8px 16px 14px}
+.vbtn{background:none;border:0;color:var(--muted);font:600 13px Rubik,sans-serif;cursor:pointer;padding:6px 10px;border-radius:99px}
+.vbtn:hover,.vbtn:focus-visible{background:rgba(255,255,255,.08);color:#fff;outline:none}
+.notes{position:fixed;inset:0;z-index:100;background:rgba(10,5,30,.7);display:flex;align-items:center;justify-content:center;padding:16px;animation:fadein .2s both}
+.notesbox{background:#fff;color:var(--ink);border-radius:22px;width:100%;max-width:520px;max-height:85vh;max-height:85dvh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:pop .3s both}
+.noteshead{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 10px;border-bottom:2px solid #eee8ff}
+.noteshead h2{font-family:Bungee,sans-serif;font-size:24px;color:var(--pink)}
+.notesx{background:#eee8ff;border:0;width:36px;height:36px;border-radius:50%;font:800 16px Rubik,sans-serif;color:var(--ink);cursor:pointer}
+.notesbody{overflow-y:auto;padding:6px 20px 20px;-webkit-overflow-scrolling:touch}
+.note{padding:14px 0;border-bottom:1px solid #eee8ff}
+.note:last-child{border-bottom:0}
+.notev{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.vtag{font-family:Bungee,sans-serif;font-size:16px;background:#eee8ff;padding:3px 10px;border-radius:99px}
+.vtag.new{background:var(--yellow)}
+.vnew{background:var(--pink);color:#fff;font-weight:800;font-size:11px;letter-spacing:.06em;padding:3px 8px;border-radius:99px}
+.vdate{margin-left:auto;color:#6b5b9a;font-size:13px;font-weight:600}
+.vday{font-weight:800;font-size:18px}
+.notev .vtag{margin-left:auto;font-size:14px}
+.note ul{margin:10px 0 0;padding-left:20px;line-height:1.45}
+.note li{margin:4px 0}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.testbadge{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:99;background:#ff8a3d;color:#1b0f3b;font:800 12px Rubik,sans-serif;letter-spacing:.08em;padding:4px 12px;border-radius:0 0 10px 10px;pointer-events:none}
 .wstatus{display:flex;flex-direction:column;gap:12px;background:rgba(255,255,255,.07);border-radius:18px;padding:14px}
 .wgroup{display:flex;flex-direction:column;gap:8px}
 .wstatus{gap:8px}
@@ -204,6 +265,43 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
 .tbarv{height:12px;background:#ece7ff;border-radius:99px;overflow:hidden;margin-top:12px}
 .tbarv div{height:100%;background:linear-gradient(90deg,var(--pink),var(--yellow));border-radius:99px;transition:width .4s}
 .tcount{font-family:Bungee,sans-serif;font-size:18px;margin-top:6px}
+.home{max-width:480px;gap:22px}
+.backhome{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:8px 14px 8px 10px;border-radius:999px;border:2px solid rgba(255,255,255,.22);
+  background:transparent;color:#e9e3ff;font:700 15px Rubik,sans-serif;cursor:pointer}
+.backhome:hover,.backhome:focus-visible{background:rgba(255,255,255,.1);color:#fff;outline:none}
+.signwrap{width:100%;display:flex;flex-direction:column;align-items:center}
+.sign{position:relative;width:100%;box-sizing:border-box;background:#2a1a5e;border-radius:28px;padding:30px 22px 32px;
+  box-shadow:0 0 0 9px #2a1a5e,0 0 40px rgba(255,210,63,.3);display:flex;flex-direction:column;align-items:center;gap:4px;
+  animation:signglow 2.4s ease-in-out infinite alternate}
+.bulbs{position:absolute;inset:0;pointer-events:none}
+.bulb{position:absolute;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#6e5a1c;
+  animation:bulb 1s linear var(--d,0s) infinite}
+/* acceso per metà giro, spento per l'altra metà; lo sfasamento di ogni lampadina crea l'inseguimento */
+@keyframes bulb{0%,49.9%{background:var(--yellow);box-shadow:0 0 6px 1px rgba(255,210,63,.9)}50%,100%{background:#6e5a1c;box-shadow:none}}
+@keyframes signglow{from{box-shadow:0 0 0 9px #2a1a5e,0 0 26px rgba(255,210,63,.22)}to{box-shadow:0 0 0 9px #2a1a5e,0 0 58px rgba(255,210,63,.5)}}
+@keyframes flicker{0%,18%,21%,24%,100%{opacity:1}19%,22%{opacity:.35}23%{opacity:.8}}
+.signlogo{margin:0;font-family:Bungee,sans-serif;font-weight:400;font-size:clamp(50px,15vw,64px);line-height:.98;text-align:center;color:var(--yellow);text-shadow:0 5px 0 #b8860b}
+.signlogo span{color:var(--pink);text-shadow:0 5px 0 #a3125e;display:inline-block;animation:flicker 5s linear infinite}
+.stage{width:78%;height:18px;background:#2a1a5e;border-radius:0 0 50% 50%}
+.signwrap.compact{max-width:340px;margin:6px auto 0}
+.signwrap.compact .sign{padding:22px 18px 24px;border-radius:24px}
+.signwrap.compact .signlogo{font-size:clamp(36px,11vw,46px)}
+.signwrap.compact .stage{height:12px}
+.lobbyL .signwrap.compact{margin:6px 0 0}
+.hometag{margin:0;font-size:19px;line-height:1.4;color:#e9e3ff}
+.homebtn{display:flex;align-items:center;justify-content:center;gap:10px}
+.homechips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.homechips span{border:2px solid rgba(255,255,255,.22);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:600;color:#e9e3ff}
+.howto{width:100%;display:flex;flex-direction:column;gap:16px;text-align:left;margin-top:6px}
+.howto h2{font-family:Bungee,sans-serif;font-weight:400;font-size:22px;color:#fff}
+.notesgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.hnote{color:var(--ink);border:3px solid var(--ink);border-radius:12px;padding:14px;box-shadow:4px 4px 0 rgba(0,0,0,.45);display:flex;flex-direction:column;gap:6px}
+.hnote b{font-family:Bungee,sans-serif;font-weight:400;font-size:28px;line-height:1}
+.hnote p{margin:0;font-size:15px;line-height:1.35;font-weight:600}
+.hnote.n1{background:var(--yellow);transform:rotate(-1.5deg)}
+.hnote.n2{background:var(--cyan);transform:rotate(1.5deg)}
+.hnote.n3{background:#ff8fc4;transform:rotate(1deg)}
+.hnote.n4{background:#c9bcff;transform:rotate(-1deg)}
 .spinner{width:56px;height:56px;border:6px solid rgba(255,255,255,.2);border-top-color:var(--yellow);border-radius:50%;animation:spin 1s linear infinite}
 .shake{animation:shake .35s}
 
@@ -215,7 +313,10 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
 @keyframes bob{50%{transform:translateY(-8px)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
+  .sign .bulb{animation:bulb 1s linear var(--d,0s) infinite!important}
+  .sign{animation:signglow 2.4s ease-in-out infinite alternate!important}
+  .signlogo span{animation:flicker 5s linear infinite!important}}
 </style>
 </head>
 <body>
@@ -292,11 +393,283 @@ const PROMPTS = [
   "Profilo di incontri: 'Amo ___, odio ___.'",
   "Quest'anno a Natale regalerò ___ a ___.",
   "Cosa ho imparato quest'anno: mai mischiare ___ e ___.",
-  "La casa infestata più famosa d'Italia: dentro c'è ___ che urla '___'."
+  "La casa infestata più famosa d'Italia: dentro c'è ___ che urla '___'.",
+  // --- frasi aggiunte nella v1.9 ---
+  "La cosa più imbarazzante da trovare nella cronologia del browser: ___",
+  "Il nome del WiFi del vicino più antipatico: ___",
+  "La password più prevedibile di tuo zio: ___",
+  "Il messaggio più passivo-aggressivo nel gruppo del condominio: ___",
+  "L'oggetto più inutile nel cassetto della cucina: ___",
+  "La cosa più triste da trovare in un calzino: ___",
+  "La lezione di vita che ti ha insegnato la lavatrice: ___",
+  "Cosa sogna un frigorifero: ___",
+  "La notifica più inquietante che può mandarti il frigorifero smart: ___",
+  "La cosa che si sente sempre attraverso le pareti sottili degli hotel: ___",
+  "Il motivo per cui ti hanno bannato dal supermercato: ___",
+  "Il motivo per cui il lunedì è stato inventato: ___",
+  "La cosa che ti fa capire che la festa è finita: ___",
+  "Il peggior momento per starnutire: ___",
+  "La cosa più strana da ordinare al bar alle 7 di mattina: ___",
+  "Il segreto meglio custodito del bar sotto casa: ___",
+  "La regola numero uno del condominio: niente ___ dopo ___.",
+  "Il mio vicino ha installato ___ sul balcone per spaventare ___.",
+  "Annuncio in bacheca: vendo ___, regalo ___.",
+  "Al supermercato hanno messo ___ nel reparto ___.",
+  "Il robot aspirapolvere ha sbagliato: invece di ___ ha fatto ___.",
+  "Il manuale di istruzioni dice: prima ___, poi ___, poi piangi.",
+  "Ho chiamato il servizio clienti per ___ e mi hanno proposto ___.",
+  "Il mio ultimo acquisto online: ___ in offerta con ___.",
+  "Il motto ufficiale della tua famiglia: ___",
+  "L'unico consiglio che tuo padre ti dà su tutto: ___",
+  "La cosa più pericolosa da dire alla suocera: ___",
+  "La didascalia perfetta per una foto con la nonna: ___",
+  "Il segreto per sopravvivere al pranzo di Natale in famiglia: ___",
+  "Il peggior augurio di compleanno: ___",
+  "La peggior sorpresa per un addio al celibato: ___",
+  "La sorpresa peggiore dentro un uovo di Pasqua: ___",
+  "La cosa che si urla di più al karaoke alle 3 di notte: ___",
+  "La cosa che urli quando perdi a Monopoli: ___",
+  "Il peggior nome da dare a un figlio: ___",
+  "Le due cose che non mancano mai a una cena di famiglia: ___ e ___.",
+  "Al mio matrimonio voglio ___ come testimone e ___ come torta.",
+  "Il discorso del testimone di nozze è iniziato con ___ ed è finito con ___.",
+  "Mia madre ha trovato ___ nella mia stanza e ha chiamato ___.",
+  "Mio nonno racconta sempre di quando ha combattuto contro ___ armato di ___.",
+  "L'allenamento segreto dei nonni: ___ in giardino e ___ in cantina.",
+  "Il gruppo WhatsApp delle mamme parla solo di ___ e ___.",
+  "Lettera a Babbo Natale: quest'anno vorrei ___, ma mi accontento di ___.",
+  "Il mago della festa ha fatto sparire ___ e apparire ___.",
+  "Il pagliaccio del compleanno ha portato ___ invece di ___.",
+  "La frase che non vuoi leggere su un biglietto di San Valentino: ___",
+  "Il peggior posto per fare una proposta di matrimonio: ___",
+  "Il mio appuntamento perfetto finisce sempre con ___",
+  "La red flag più grande in un profilo di incontri: ___",
+  "Al primo appuntamento ho parlato solo di ___ e lei è scappata con ___.",
+  "I due ingredienti segreti della pozione dell'amore: ___ e ___.",
+  "Il segreto di una relazione felice: ___ ogni giorno e mai ___.",
+  "Il viaggio di nozze perfetto: una settimana a ___ con ___.",
+  "La mia app di incontri ideale abbina chi ama ___ con chi odia ___.",
+  "La frase da evitare durante un colloquio di lavoro: ___",
+  "Il talento nascosto del tuo capo: ___",
+  "Il corso di formazione aziendale più inutile: ___",
+  "Il peggior lavoro estivo di sempre: ___",
+  "Il titolo della tesi di laurea più inutile: ___",
+  "La materia scolastica che dovrebbe esistere: ___",
+  "Il soprannome peggiore da avere a scuola: ___",
+  "L'esame di maturità del futuro chiederà: ___",
+  "La mail più temuta del lunedì mattina ha come oggetto: ___",
+  "Il capo ha detto che sarò promosso se porto ___ e smetto di ___.",
+  "Primo giorno di lavoro: ho rotto ___ e ho insultato ___.",
+  "Il professore mi ha bocciato perché ho scritto ___ al posto di ___.",
+  "L'università ha aperto una laurea in ___ con specializzazione in ___.",
+  "In gita scolastica il prof ha perso ___ e ritrovato ___.",
+  "Sono stato espulso dalla scuola di cucina per aver messo ___ nel ___.",
+  "Il nome di una pizza che nessuno ordinerà mai: ___",
+  "La cosa peggiore da trovare nel panino: ___",
+  "Il peggior nome per un ristorante di sushi: ___",
+  "La nuova specialità del fast food all'italiana: ___",
+  "Il vero ingrediente segreto della crema alla nocciola: ___",
+  "Il gusto di caramella che sa di lunedì mattina: ___",
+  "Il nome di un cocktail che ti fa piangere: ___",
+  "La cosa da non portare mai a un picnic: ___",
+  "Il nuovo gusto di patatine: ___ al sapore di ___.",
+  "Nuovo menù del giorno: ___ con contorno di ___.",
+  "Il nuovo gusto della cola: ___ e ___.",
+  "La nuova sagra del paese: la sagra del ___ con il concerto di ___.",
+  "Il libro di ricette del diavolo: ___ alla ___.",
+  "La nuova funzione inutile del prossimo smartphone: ___",
+  "La nuova emoji che tutti aspettavano: ___",
+  "Il prossimo trend dei social che finirà male: ___",
+  "Il primo messaggio di un'intelligenza artificiale ribelle: ___",
+  "La prima cosa che fa un robot quando diventa cosciente: ___",
+  "Cosa contiene il kit di sopravvivenza di un influencer: ___",
+  "Il titolo di un podcast che nessuno ascolterà: ___",
+  "Cosa dice il navigatore quando si arrabbia: ___",
+  "Il tutorial online: come fare ___ con ___ in 5 minuti.",
+  "Il nuovo videogioco: devi salvare ___ dal malvagio ___.",
+  "Il primo comandamento dei gatti: ___",
+  "Il motivo per cui il gatto ti fissa da un'ora: ___",
+  "Cosa pensa il cane quando lo vesti per Halloween: ___",
+  "Il titolo dell'autobiografia di un piccione: ___",
+  "Il nome perfetto per un criceto con problemi di rabbia: ___",
+  "Il primo pensiero di un bradipo al risveglio: ___",
+  "La frase più usata da un pinguino depresso: ___",
+  "Il motivo per cui le formiche marciano in fila: ___",
+  "Il nome di un nuovo dinosauro appena scoperto: ___",
+  "Il mio gatto ha imparato a ___ e adesso pretende ___.",
+  "Il mio cane ha mangiato ___ e adesso parla come ___.",
+  "L'unico modo per calmare un orso: offrirgli ___ e cantare ___.",
+  "Il nome di un fantasma che fa più ridere che paura: ___",
+  "La cosa che i vampiri odiano più dell'aglio: ___",
+  "La cosa che fanno gli zombie nel weekend: ___",
+  "Il nome di un mostro che vive nel bidè: ___",
+  "La strega più scarsa del mondo trasforma le persone in ___",
+  "Il mostro sotto il letto in realtà è solo ___",
+  "La zucca di Halloween più spaventosa ha la faccia di ___",
+  "La cosa che non diresti mai durante una seduta spiritica: ___",
+  "L'ultima cosa che vedi prima di svegliarti da un incubo: ___",
+  "Per Halloween mi vesto da ___ con accessori di ___.",
+  "Il fantasma di casa mia ogni notte sposta ___ e nasconde ___.",
+  "Il vampiro vegano beve solo ___ e mangia ___.",
+  "Il castello infestato offre: ___ in camera e ___ a colazione.",
+  "Il menù di Halloween: zuppa di ___ e torta al ___.",
+  "Cosa ci fa un unicorno quando nessuno lo guarda: ___",
+  "Il sapore delle lacrime di un unicorno: ___",
+  "La domanda che non faresti mai a un mago: ___",
+  "L'hobby segreto di un cavaliere medievale: ___",
+  "Il prossimo mostriciattolo leggendario da collezionare: ___",
+  "Il vero motivo per cui gli alieni non ci contattano: ___",
+  "Cosa urla un pirata in pensione: ___",
+  "Il drago non vuole l'oro: vuole ___ e ___.",
+  "Ho trovato una lampada magica: il genio mi ha dato ___ invece di ___.",
+  "La nuova classe del gioco di ruolo: il ___ che combatte con ___.",
+  "Su Marte hanno trovato tracce di ___ e un cartello che dice «___».",
+  "Il trucco del prestigiatore: ___ nella manica e ___ nel cappello.",
+  "Il mio piano per conquistare il mondo: prima ___ e poi ___.",
+  "Il motivo per cui la Torre di Pisa pende davvero: ___",
+  "Il motivo vero per cui la Gioconda sorride: ___",
+  "Cosa ha detto davvero Dante quando ha visto l'Inferno: ___",
+  "Il vero nome di battesimo di Babbo Natale: ___",
+  "Il libro più noioso della biblioteca: ___",
+  "La cosa più rumorosa che puoi fare in biblioteca: ___",
+  "Il sottotitolo del nuovo film di un ragioniere sfortunato: ___",
+  "La storia vera: Cristoforo Colombo cercava ___ e ha trovato ___.",
+  "Il vero motivo per cui i Romani hanno costruito il Colosseo: ___ e ___.",
+  "Al museo hanno esposto ___ accanto a ___.",
+  "La nuova serie di francobolli celebra ___ e ___.",
+  "Il premio Nobel quest'anno va a ___ per aver inventato ___.",
+  "La nuova regola del calcio che renderebbe le partite più divertenti: ___",
+  "La prossima mascotte delle Olimpiadi: ___",
+  "Lo sport che pratichi quando nessuno ti vede: ___",
+  "La scusa più assurda per non andare in palestra: ___",
+  "Cosa c'è scritto in piccolo nel contratto della palestra: ___",
+  "Per vincere la Champions serve ___ in porta e ___ in panchina.",
+  "Il nuovo corso in palestra: ___ con sottofondo di ___.",
+  "La nuova olimpiade per anziani: lancio del ___ e corsa con ___.",
+  "La mia playlist per la palestra: ___ alternato a ___.",
+  "Il nome d'arte del rapper di quartiere: ___",
+  "Il titolo del tormentone di un DJ di 80 anni: ___",
+  "Il nome di una band indie che suona solo al mattino: ___",
+  "La canzone da non mettere mai a un funerale: ___",
+  "Il talento più inutile da mostrare a un talent show: ___",
+  "Nel prossimo episodio del festival: ___ canta in duetto con ___.",
+  "La tua carriera da DJ è finita quando hai mixato ___ con ___.",
+  "Il festival estivo più strano: tre giorni di ___ e ___.",
+  "Il prossimo film di supereroi: ___ contro l'esercito di ___.",
+  "Il prossimo successo in streaming: una serie su ___ che si innamora di ___.",
+  "Nella prossima casa del reality entrano ___ e ___.",
+  "La nuova stagione della serie: ___ scopre di essere figlio di ___.",
+  "Il souvenir peggiore da portare dalle vacanze: ___",
+  "L'ultima cosa che vorresti sentire dal pilota dell'aereo: ___",
+  "Cosa c'è nella valigia di un agente segreto in vacanza: ___",
+  "Il nome di una crociera per persone che odiano il mare: ___",
+  "La nuova attrazione del parco divertimenti: ___",
+  "La recensione online di un vulcano: ___",
+  "La scritta più strana su una maglietta da turista: ___",
+  "La cosa più strana che hai visto in metropolitana: ___",
+  "La guida turistica dice: a Roma non perdetevi ___ e ___.",
+  "Nel bunker antiatomico porterei ___ e ___.",
+  "Nel mio zaino di emergenza ci sono ___ e ___.",
+  "La pubblicità più onesta di uno yogurt: ___",
+  "Il nome di un energy drink per nonni: ___",
+  "Il nome di un profumo per veri duri: ___",
+  "Il peggior nome per un asilo nido: ___",
+  "Il peggior nome per una nave da guerra: ___",
+  "La nuova parolaccia approvata dai linguisti: ___",
+  "La nuova parola del dialetto della tua città: ___",
+  "Cosa c'è scritto nel biglietto della fortuna più deprimente di sempre: ___",
+  "Il segreto che i camerieri non ti diranno mai: ___",
+  "Breaking news: ___ ha sposato ___ in gran segreto.",
+  "Breaking news: trovato ___ dentro ___.",
+  "L'oroscopo di oggi: attenzione a ___, la fortuna arriverà da ___.",
+  "La campagna pubblicitaria del Ministero: «Scegli ___, evita ___».",
+  "Il nuovo vaccino contro la noia contiene ___ e un pizzico di ___.",
+  "Il bigliettino nel biscotto della fortuna dice: «Diffida di ___ e cerca ___».",
+  "La sfilata di moda di quest'anno: abiti fatti di ___ e ___.",
+  "La nuova bambola alla moda: ___ con accessorio ___.",
+  "La mia autobiografia si chiama: «___: una vita tra ___».",
+  "La prima cosa che farei se fossi invisibile per un giorno: ___",
+  "La nuova legge che approveresti se fossi presidente per un giorno: ___",
+  "Il primo piatto servito all'inferno: ___",
+  "Il peggior tatuaggio da farsi dopo una serata storta: ___",
+  "Il peggior effetto collaterale di una medicina: ___",
+  "La sindrome che nemmeno il medico riesce a spiegare: ___",
+  "Cosa fanno i manichini di notte nei negozi: ___",
+  "Cosa c'è sotto il tappeto della Casa Bianca: ___",
+  "Cosa nasconde un vigile urbano nel suo armadietto: ___",
+  "Il nome di un sindacato dei calzini spaiati: ___",
+  "La cosa più strana da mettere sul curriculum: ___",
+  "Se fossi un supereroe, il mio nemico giurato sarebbe ___ armato di ___.",
+  "Il segreto della longevità: mangiare ___ e non pensare mai a ___.",
+  "Il tuo destino è scritto nelle stelle: diventerai ___ e vivrai con ___.",
+  "Quando sarò ricco comprerò ___ e lo regalerò a ___.",
+  "Il mio talento nascosto: so fare ___ usando solo ___.",
+  "Il medico mi ha detto: troppo ___ e troppo poco ___.",
+  "Guida di sopravvivenza al lunedì: ___ appena sveglio e ___ prima di pranzo."
 ];
 
 /* ===================== UTILITY ===================== */
-const PREFIX = 'tappabuchi-v1-';
+// Versione di prova: se il gioco è aperto da /test/ usa stanze separate e mostra l'etichetta TEST
+const IS_TEST = /\/test\/?$/.test(location.pathname.replace(/index\.html$/, ''));
+const PREFIX = IS_TEST ? 'tappabuchi-test-v1-' : 'tappabuchi-v1-';
+if (IS_TEST){
+  document.title = 'TEST · ' + document.title;
+  const b = document.createElement('div');
+  b.className = 'testbadge'; b.textContent = 'VERSIONE DI PROVA';
+  document.body.appendChild(b);
+}
+
+/* ===================== VERSIONE E PATCH NOTES ===================== */
+// Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
+const VERSION = '1.17';
+// Un blocco per giorno (il più recente in cima). Aggiornamento nello stesso giorno: aggiungi la riga in cima al blocco e alza "to".
+const PATCH_NOTES = [
+  {date:'1 novembre 2026', from:'1.17', to:'1.17', items:[
+    'Tutte le novità diventano ufficiali'
+  ]},
+  {date:'31 ottobre 2026', from:'1.8', to:'1.16', items:[
+    'Nuova homepage con l\'insegna animata, anche nelle altre schermate',
+    'Riconnessione automatica: dopo un crash rientri da solo nella partita',
+    'Oltre 270 frasi, che non si ripetono',
+    'Conto alla rovescia prima della schermata successiva',
+    'Puoi cambiare nome nella lobby',
+    'L\'host può tornare alla homepage dalla stanza',
+    'Arrivano le patch notes'
+  ]},
+  {date:'19 ottobre 2026', from:'1.0', to:'1.7', items:[
+    'Prima versione di Tappabuchi',
+    'Chi crea la stanza gioca con le stesse schermate degli altri e può invitare gli amici',
+    'Ogni sfida: risposte, voto, vincitore e classifica su tutti i telefoni',
+    'Chi è in sfida vede i voti in tempo reale, con schermate diverse da chi vota',
+    'Vedi chi sta ancora scrivendo e chi ha finito'
+  ]}
+];
+
+function openNotes(){
+  if (document.getElementById('notes')) return;
+  const d = document.createElement('div');
+  d.id = 'notes'; d.className = 'notes';
+  d.innerHTML = `<div class="notesbox" role="dialog" aria-modal="true" aria-labelledby="notesT">
+    <div class="noteshead"><h2 id="notesT">Patch notes</h2><button class="notesx" aria-label="Chiudi">✕</button></div>
+    <div class="notesbody">${PATCH_NOTES.map((n, i) => `<section class="note">
+      <div class="notev"><span class="vday">${esc(n.date)}</span>${i === 0 ? '<span class="vnew">ULTIMO</span>' : ''}<span class="vtag ${i === 0 ? 'new' : ''}">${n.from === n.to ? 'v' + esc(n.to) : 'v' + esc(n.from) + ' – v' + esc(n.to)}</span></div>
+      <ul>${n.items.map(t => `<li>${esc(t)}</li>`).join('')}</ul></section>`).join('')}</div></div>`;
+  const close = () => { d.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  d.onclick = e => { if (e.target === d) close(); };
+  d.querySelector('.notesx').onclick = close;
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(d);
+  d.querySelector('.notesx').focus();
+}
+(function addFooter(){
+  const f = document.createElement('footer');
+  f.className = 'vfoot';
+  f.innerHTML = `<button class="vbtn" title="Novità di questa versione">Tappabuchi v${VERSION}${typeof IS_TEST !== 'undefined' && IS_TEST ? ' · prova' : ''} · <u>patch notes</u></button>`;
+  f.querySelector('button').onclick = openNotes;
+  document.body.appendChild(f);
+})();
+
 const COLORS = ['#ffd23f','#ff4fa3','#3ee6d0','#a99bff','#ff8a3d','#7ee36b','#4fb3ff','#ff6b6b','#f6a5ff','#c2f04d'];
 const app = document.getElementById('app');
 const $ = s => document.querySelector(s);
@@ -316,6 +689,11 @@ const norm = s => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
 function store(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
 function load(k){ try { return localStorage.getItem(k) || ''; } catch(e){ return ''; } }
 function send(c, m){ try { if (c && c.open) c.send(m); } catch(e){} }
+const nextBarHTML = label => `<div class="nextbar" role="timer" aria-live="off">
+    <div class="nlabel"><span>⏭️ ${esc(label)} tra</span> <b><span id="tnum"></span> s</b></div>
+    <div class="tbar"><div id="tbar"></div></div></div>`;
+const hostCdHTML = label => `<div class="hcd"><div class="nlabel"><span>⏭️ ${esc(label)}</span> <b><span id="tnum"></span> s</b></div>
+    <div class="tbar"><div id="tbar"></div></div></div>`;
 const timerHTML = () => `<div class="timer"><div class="tbar"><div id="tbar"></div></div><div id="tnum" class="tnum"></div></div>`;
 const spinner = msg => `<div class="screen center"><div class="spinner"></div><p class="lead">${esc(msg)}</p></div>`;
 function showError(msg){
@@ -326,35 +704,81 @@ function showError(msg){
 let MODE = null;
 
 /* ===================== HOME ===================== */
+// insegna animata del gioco: la stessa in homepage e nelle altre schermate
+function signHTML(compact){
+  return `<div class="signwrap${compact ? ' compact' : ''}">
+      <div class="sign">
+        <div class="bulbs" aria-hidden="true"></div>
+        <h1 class="signlogo">TAPPA<br><span>BUCHI</span></h1>
+      </div>
+      <div class="stage" aria-hidden="true"></div>
+    </div>`;
+}
+// lampadine dell'insegna: 48 punti equidistanti sul bordo (angoli arrotondati compresi).
+// Ognuna si accende e si spegne a turno: animazione semplice che funziona su tutti i browser.
+const BULBS = 48;
+function placeBulbs(sign){
+  const box = sign.querySelector('.bulbs'); if (!box) return;
+  const w = sign.offsetWidth, h = sign.offsetHeight; if (!w || !h) return;
+  const key = w + 'x' + h; if (box.dataset.k === key) return; box.dataset.k = key;
+  const r = Math.min(parseFloat(getComputedStyle(sign).borderTopLeftRadius) || 0, w / 2, h / 2);
+  const sw = w - 2 * r, sh = h - 2 * r, arc = Math.PI * r / 2;
+  const segs = [ // [lunghezza, punto alla distanza t]
+    [sw, t => [r + t, 0]],
+    [arc, t => { const a = -Math.PI / 2 + t / r; return [w - r + r * Math.cos(a), r + r * Math.sin(a)]; }],
+    [sh, t => [w, r + t]],
+    [arc, t => { const a = t / r; return [w - r + r * Math.cos(a), h - r + r * Math.sin(a)]; }],
+    [sw, t => [w - r - t, h]],
+    [arc, t => { const a = Math.PI / 2 + t / r; return [r + r * Math.cos(a), h - r + r * Math.sin(a)]; }],
+    [sh, t => [0, h - r - t]],
+    [arc, t => { const a = Math.PI + t / r; return [r + r * Math.cos(a), r + r * Math.sin(a)]; }]
+  ];
+  const total = segs.reduce((a, x) => a + x[0], 0), step = total / BULBS;
+  let html = '';
+  for (let i = 0; i < BULBS; i++){
+    let d = i * step, k = 0;
+    while (k < segs.length - 1 && d > segs[k][0]){ d -= segs[k][0]; k++; }
+    const [x, y] = segs[k][1](Math.min(d, segs[k][0]));
+    html += `<i class="bulb" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;--d:${(-(i % 4) * 0.25).toFixed(2)}s"></i>`;
+  }
+  box.innerHTML = html;
+}
+function placeAllBulbs(){ document.querySelectorAll('.sign').forEach(placeBulbs); }
+// ogni volta che cambia la schermata o la misura della finestra
+new MutationObserver(() => requestAnimationFrame(placeAllBulbs)).observe(app, {childList:true});
+addEventListener('resize', () => requestAnimationFrame(placeAllBulbs));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeAllBulbs);
+
 function home(){
   document.body.dataset.mode = '';
   MODE = null; window.onbeforeunload = null;
-  app.innerHTML = `<div class="screen center">
-    <h1 class="logo">TAPPA<span>BUCHI</span></h1>
-    <p class="tag">Riempi i buchi. Sfida un amico. Fai ridere tutti.</p>
+  app.innerHTML = `<div class="screen center home">
+    ${signHTML()}
+    <p class="hometag">Riempi i buchi. Sfida un amico.<br>Fai ridere tutti.</p>
     <div class="stack">
-      <button class="btn big" id="bHost">📺 Crea una partita</button>
-      <button class="btn big alt" id="bJoin">📱 Entra con il telefono</button>
+      <button class="btn big homebtn" id="bHost"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Crea una partita</button>
+      <button class="btn big alt homebtn" id="bJoin"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Entra con un codice</button>
     </div>
-    <div class="how card">
-      <h3>Come si gioca</h3>
-      <ol>
-        <li>Apri la partita su un PC o una TV: sarà lo schermo comune.</li>
-        <li>Ognuno entra dal proprio telefono con il codice stanza (o il QR).</li>
-        <li>Riempi i buchi delle frasi: ogni frase ce l'ha anche un altro giocatore.</li>
-        <li>Le due risposte si sfidano e tutti gli altri votano la migliore.</li>
-        <li>Tre round, l'ultimo con una frase per tutti. Vince chi fa più punti!</li>
-      </ol>
-    </div>
+    <div class="homechips"><span>3–10 giocatori</span><span>Dal telefono</span><span>Senza app</span></div>
+    <section class="howto">
+      <h2>Come si gioca</h2>
+      <div class="notesgrid">
+        <div class="hnote n1"><b>1</b><p>Crea la stanza e invita gli amici col codice.</p></div>
+        <div class="hnote n2"><b>2</b><p>Riempi i buchi con la risposta più divertente.</p></div>
+        <div class="hnote n3"><b>3</b><p>Le risposte si sfidano: gli altri votano.</p></div>
+        <div class="hnote n4"><b>4</b><p>Tre round e classifica: vince chi fa ridere.</p></div>
+      </div>
+    </section>
   </div>`;
   $('#bHost').onclick = hostSetup;
   $('#bJoin').onclick = () => joinScreen();
 }
 
 /* ===================== HOST ===================== */
+function loadUsed(){ try { const a = JSON.parse(load('tb_used') || '[]'); return Array.isArray(a) ? a : []; } catch(e){ return []; } }
 const H = {
   peer:null, code:'', players:[], seq:0, phase:'lobby', round:0, matchups:[], cur:-1,
-  timerEnd:0, timerTotal:0, tok:0, to:null, used:new Set(),
+  timerEnd:0, timerTotal:0, tok:0, to:null, used:new Set(loadUsed()),
   settings:{answerTime:90, voteTime:10}, custom:[], customRaw:'', onlyCustom:false
 };
 
@@ -363,7 +787,7 @@ function genCode(){ const L = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; let c = ''; for (let i
 function hostSetup(){
   MODE = null;
   app.innerHTML = `<div class="screen phone center">
-    <h1 class="logo sm">TAPPA<span>BUCHI</span></h1>
+    ${signHTML(true)}
     <div class="card form">
       <h3>Crea una partita</h3>
       <label>Il tuo nome<input id="hname" maxlength="16" autocomplete="off" value="${esc(load('tb_name'))}" placeholder="Es. Pietro"></label>
@@ -390,6 +814,8 @@ function localRecv(m){
   if (!H.me) return;
   if (m.t === 'joined'){ const p = H.players.find(x => x.conn === LOCAL); if (p){ p.host = true; H.me.id = p.id; } }
   else if (m.t === 'view'){ H.me.view = m.v; if (document.getElementById('hp')) drawHP(); else drawMe(); }
+  else if (m.t === 'renamed'){ store('tb_name', m.name); const e = document.getElementById('hrmsg'); if (e){ e.className = 'rmsg ok'; e.textContent = 'Nome cambiato!'; } }
+  else if (m.t === 'renameErr'){ const e = document.getElementById('hrmsg'); if (e){ e.className = 'rmsg bad'; e.textContent = m.msg; } }
 }
 function drawMe(){
   const el = document.getElementById('me');
@@ -411,7 +837,7 @@ function drawHP(){
   if (el.dataset.key === key){ updStatus(el, v); return; }
   el.dataset.key = key;
   el.innerHTML = `<div class="ptop"><span class="dot" style="background:${v.color}"></span><b>👑 ${esc(v.name)}</b><span class="pill" style="margin-left:6px">Stanza ${H.code}</span><span class="pscore">${v.score} pt</span></div>`
-               + playerBody(v, false);
+               + playerBody(Object.assign({}, v, {next:''}), false);
   setMode(v);
   wirePlayer(el, v, d => hostMsg(LOCAL, d));
 }
@@ -430,11 +856,16 @@ function drawBar(){
   const k = H.phase + '|' + H.cur + '|' + (b ? b[0] : '');
   if (el.dataset.key === k) return;
   el.dataset.key = k;
-  el.innerHTML = b ? `<span class="muted small">Comandi host</span><button class="btn small ${H.phase === 'end' ? '' : 'ghost'}" id="hb">${b[0]}</button>` : '';
+  const cd = (H.phase === 'winner' || H.phase === 'points') && H.timerEnd;
+  el.classList.toggle('hnext', !!cd);
+  el.innerHTML = !b ? '' : cd
+    ? `${hostCdHTML(nextLabel())}<button class="btn small" id="hb">Vai subito ▶</button>`
+    : `<span class="muted small">Comandi host</span><button class="btn small ${H.phase === 'end' ? '' : 'ghost'}" id="hb">${b[0]}</button>`;
   if (b) $('#hb').onclick = b[1];
 }
 
 function hostStart(myName){
+  clearSess();
   if (typeof Peer === 'undefined') return showError('Impossibile caricare la libreria di rete. Controlla la connessione.');
   MODE = 'host';
   app.innerHTML = spinner('Creo la stanza…');
@@ -462,15 +893,24 @@ document.addEventListener('visibilitychange', () => { if (MODE === 'host' && doc
 
 function onConn(conn){
   conn.on('data', d => { try { hostMsg(conn, d); } catch(e){ console.error(e); } });
-  const lost = () => {
-    const p = H.players.find(x => x.conn === conn);
-    if (!p || !p.connected) return;
-    p.connected = false;
-    if (H.phase === 'lobby'){ H.players.splice(H.players.indexOf(p), 1); broadcast(); }
-    renderHost(); checkProgress();
-  };
+  const lost = () => { const p = H.players.find(x => x.conn === conn); if (p) markLost(p, false); };
   conn.on('close', lost); conn.on('error', lost);
 }
+// un giocatore è sparito (connessione chiusa o nessun segnale da troppo tempo)
+function markLost(p, closeIt){
+  if (!p.connected || p.conn === LOCAL) return;
+  p.connected = false;
+  if (closeIt) try { p.conn.close(); } catch(e){}
+  if (H.phase === 'lobby') H.players.splice(H.players.indexOf(p), 1);
+  broadcast(); renderHost(); checkProgress();
+}
+// controllo di presenza: chi non manda segnali da 15 secondi viene segnato come disconnesso
+const HOST_TIMEOUT = 15000;
+setInterval(() => {
+  if (MODE !== 'host') return;
+  const now = Date.now();
+  H.players.slice().forEach(p => { if (p.conn !== LOCAL && p.connected && p.hb && p.seen && now - p.seen > HOST_TIMEOUT) markLost(p, true); });
+}, 3000);
 
 const byId = id => H.players.find(p => p.id === id);
 const cur = () => H.matchups[H.cur];
@@ -485,24 +925,44 @@ function hostMsg(conn, d){
   if (d.t === 'join'){
     const name = String(d.name || '').trim().replace(/\s+/g,' ').slice(0, 16);
     if (!name) return send(conn, {t:'err', msg:'Inserisci un nome.'});
-    let p = H.players.find(x => x.name.toLowerCase() === name.toLowerCase());
+    const tok = String(d.tok || '').slice(0, 64);
+    // prima cerco il dispositivo (chiave segreta), poi il nome
+    let p = (tok && H.players.find(x => x.tok === tok)) || H.players.find(x => x.name.toLowerCase() === name.toLowerCase());
     if (p){
-      if (p.connected && p.conn !== conn && p.conn && p.conn.open) return send(conn, {t:'err', msg:'Nome già in uso. Scegline un altro.'});
-      p.conn = conn; p.connected = true;
+      const sameDevice = tok && p.tok === tok;
+      if (!sameDevice && (p.conn === LOCAL || (p.connected && p.conn !== conn && p.conn && p.conn.open)))
+        return send(conn, {t:'err', msg:'Nome già in uso. Scegline un altro.'});
+      // stesso dispositivo che rientra: chiudo la vecchia connessione (magari ancora "appesa" dopo un crash)
+      if (p.conn && p.conn !== conn && p.conn !== LOCAL) try { p.conn.close(); } catch(e){}
+      p.conn = conn; p.connected = true; if (tok) p.tok = tok;
     } else {
       if (H.phase !== 'lobby') return send(conn, {t:'err', msg:'La partita è già iniziata. Aspetta la prossima!'});
       if (H.players.length >= 10) return send(conn, {t:'err', msg:'Stanza piena (massimo 10 giocatori).'});
       const used = H.players.map(x => x.color);
-      p = {id:'p' + (++H.seq), name, score:0, conn, connected:true, color: COLORS.find(c => !used.includes(c)) || COLORS[0]};
+      p = {id:'p' + (++H.seq), name, score:0, conn, connected:true, tok, color: COLORS.find(c => !used.includes(c)) || COLORS[0]};
       H.players.push(p);
     }
+    p.seen = Date.now();
     send(conn, {t:'joined', name:p.name});
-    if (H.phase === 'lobby') broadcast(); else sendView(p);
-    renderHost(); return;
+    broadcast(); renderHost(); return;
   }
   const p = H.players.find(x => x.conn === conn);
   if (!p) return;
+  p.seen = Date.now();
+  if (d.t === 'ping'){ p.hb = true; return send(conn, {t:'pong'}); }
 
+  if (d.t === 'rename'){
+    const err = msg => send(conn, {t:'renameErr', msg});
+    if (H.phase !== 'lobby') return err('Puoi cambiare nome solo nella lobby, tra una partita e l\'altra.');
+    const name = String(d.name || '').trim().replace(/\s+/g, ' ').slice(0, 16);
+    if (!name) return err('Scrivi un nome.');
+    if (name === p.name) return send(conn, {t:'renamed', name});
+    if (H.players.some(x => x !== p && x.name.toLowerCase() === name.toLowerCase())) return err('Questo nome è già usato da un altro giocatore.');
+    p.name = name;
+    send(conn, {t:'renamed', name});
+    broadcast(); renderHost();
+    return;
+  }
   if (d.t === 'answer' && H.phase === 'answer'){
     const m = H.matchups[d.mid];
     if (!m || !m.players.includes(p.id) || m.answers[p.id]) return;
@@ -551,11 +1011,12 @@ function parseCustom(raw){
 function allPrompts(){ return (H.onlyCustom && H.custom.length) ? H.custom : PROMPTS.concat(H.custom); }
 function pick(n, preferTwo){
   let pool = allPrompts().filter(t => !H.used.has(t));
-  if (pool.length < n){ H.used.clear(); pool = allPrompts(); }
+  if (pool.length < n){ H.used.clear(); pool = allPrompts(); }  // finite tutte: si ricomincia
   pool = shuffle(pool);
   if (preferTwo){ const two = pool.filter(t => blanks(t) >= 2); if (two.length) pool = two; }
   const out = pool.slice(0, n);
   out.forEach(t => H.used.add(t));
+  store('tb_used', JSON.stringify([...H.used]));
   while (out.length < n) out.push(shuffle(allPrompts())[0]);
   return out;
 }
@@ -621,15 +1082,26 @@ function endVote(){ showWinner(cur()); }
 function showWinner(m){
   clearTimer(); score(m);
   H.phase = 'winner';
+  setTimer(AUTO.winner, showPoints);
   renderHost(); broadcast();
-  setTimer(8, showPoints, false);
+}
+// secondi prima di passare da soli alla schermata successiva
+const AUTO = {winner:8, points:14};
+// cosa arriva dopo (usato dalla barra countdown e dai pulsanti dell'host)
+function nextLabel(){
+  if (H.phase === 'winner') return 'Punti e classifica';
+  if (H.phase === 'points'){
+    if (!isLastMatch()) return 'Prossima sfida';
+    return H.round < 3 ? (H.round === 1 ? 'Round 2' : 'Round finale') : 'Classifica finale';
+  }
+  return '';
 }
 // 4) punti assegnati + classifica generale
 function showPoints(){
   clearTimer();
   H.phase = 'points';
+  setTimer(AUTO.points, nextMatch);
   renderHost(); broadcast();
-  setTimer(14, nextMatch, false);
 }
 function winnersOf(m){
   if (!m.R || m.jinx || m.novotes) return [];
@@ -689,6 +1161,21 @@ function isWinner(m, id){
 function showScores(){ clearTimer(); H.phase = 'scores'; renderHost(); broadcast(); }
 function endGame(){ clearTimer(); H.phase = 'end'; renderHost(); broadcast(); }
 function nextRound(){ H.round++; startRound(); }
+// l'host torna alla homepage: chiude la stanza e avvisa chi era entrato
+function closeRoom(){
+  const others = H.players.filter(p => p.conn !== LOCAL && p.connected).length;
+  if (others){
+    const who = others === 1 ? 'il giocatore entrato verrà fatto uscire' : `i ${others} giocatori entrati verranno fatti uscire`;
+    if (!confirm(`Vuoi chiudere la stanza ${H.code} e tornare alla homepage? ${who.charAt(0).toUpperCase() + who.slice(1)}.`)) return;
+  }
+  H.players.forEach(p => { if (p.conn !== LOCAL) send(p.conn, {t:'closed'}); });
+  clearTimer();
+  const old = H.peer;
+  setTimeout(() => { try { if (old) old.destroy(); } catch(e){} }, 400);   // il tempo di far arrivare l'avviso
+  Object.assign(H, {peer:null, code:'', players:[], phase:'lobby', round:0, matchups:[], cur:-1, me:null});
+  lastKey = '';   // la prossima stanza va ridisegnata da zero
+  home();
+}
 function playAgain(){
   clearTimer();
   H.players = H.players.filter(p => p.connected);
@@ -703,7 +1190,7 @@ function viewFor(p){
              left: H.timerEnd ? Math.max(0, H.timerEnd - Date.now()) : 0, total: H.timerTotal};
   const W = (emoji, title, msg) => Object.assign(v, {type:'wait', emoji, title, msg});
   switch (H.phase){
-    case 'lobby': return Object.assign(v, {type:'lobby', code:H.code, players:H.players.map(x => ({name:x.name, color:x.color, host:!!x.host}))});
+    case 'lobby': return Object.assign(v, {type:'lobby', code:H.code, players:H.players.map(x => ({name:x.name, color:x.color, host:!!x.host, me:x.id === p.id}))});
     case 'intro': return W('🔥', H.round < 3 ? 'Round ' + H.round : 'Round finale', introText());
     case 'answer': {
       const mine = H.matchups.map((m, i) => ({m, i})).filter(x => x.m.players.includes(p.id));
@@ -736,7 +1223,7 @@ function viewFor(p){
       if (w.includes(p.id)) mine = w.length > 1 ? 'Pareggio: sei tra i vincitori!' : 'Hai vinto la sfida!';
       else if (m.answers[p.id]) mine = 'Sfida persa… ti rifarai alla prossima!';
       const ids = answered(m).slice().sort((a, b) => (w.includes(b) - w.includes(a)) || (m.R[b].votes - m.R[a].votes));
-      return Object.assign(v, {type:'winner', title:wt.title, sub:wt.sub, mine, prompt:m.prompt,
+      return Object.assign(v, {type:'winner', next:nextLabel(), title:wt.title, sub:wt.sub, mine, prompt:m.prompt,
         cards: ids.map(id => { const a = byId(id), r = m.R[id];
           return {parts:m.answers[id], name:a.name, color:a.color, votes:r.votes, voters:r.voters, win:w.includes(id), mine:id === p.id}; })});
     }
@@ -744,10 +1231,10 @@ function viewFor(p){
       const m = cur(), gains = {};
       answered(m).forEach(id => gains[id] = m.R[id].pts);
       const r = m.R && m.R[p.id];
-      const title = r && m.answers[p.id] ? (r.pts > 0 ? '+' + r.pts + ' punti!' : 'Zero punti in questa sfida') : 'Punti della sfida';
+      const title = r && m.answers[p.id] ? (r.pts > 0 ? '+' + r.pts + ' punti!' : 'Zero punti in questa sfida') : 'Risultati della sfida';
       const gl = answered(m).sort((a, b) => m.R[b].pts - m.R[a].pts).map(id => { const a = byId(id);
         return {name:a.name, color:a.color, votes:m.R[id].votes, pts:m.R[id].pts, cappotto:m.cappotto === id, me:id === p.id}; });
-      return Object.assign(v, {type:'board', title, gains:gl, board:boardData(p, gains)});
+      return Object.assign(v, {type:'board', next:nextLabel(), title, gains:gl, board:boardData(p, gains)});
     }
     case 'scores': return W('📊', 'Sei ' + rank(p) + '°', `Hai ${p.score} punti. Guarda la classifica sullo schermo.`);
     case 'end': {
@@ -791,7 +1278,8 @@ VIEW.lobby = () => {
   const opt = (vals, cur) => vals.map(v => `<option value="${v}" ${v === cur ? 'selected' : ''}>${v} secondi</option>`).join('');
   app.innerHTML = `<div class="screen host"><div class="lobby">
     <div class="lobbyL">
-      <h1 class="logo sm">TAPPA<span>BUCHI</span></h1>
+      <button class="backhome" id="toHome"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Homepage</button>
+      ${signHTML(true)}
       <p class="lead" style="margin:0">Entra dal telefono: inquadra il QR o apri questo sito e inserisci il codice.</p>
       <div class="joinbox">
         <div id="qr"></div>
@@ -799,6 +1287,10 @@ VIEW.lobby = () => {
       </div>
       <h3>Giocatori <span id="pcount" class="muted"></span></h3>
       <div id="plist" class="chips" style="justify-content:flex-start"></div>
+      ${H.me ? `<div class="rename host">
+        <label class="rlabel" for="hrname">Il tuo nome</label>
+        <div class="rrow"><input id="hrname" maxlength="16" autocomplete="off" value="${esc((byId(H.me.id) || {}).name || '')}"><button class="btn small alt" id="hrbtn">Cambia nome</button></div>
+        <div id="hrmsg" class="rmsg"></div></div>` : ''}
       <div class="row" style="justify-content:flex-start"><button class="btn alt" id="invite">📤 Invita amici</button><span id="invmsg" class="muted small"></span></div>
       <button class="btn big" id="startBtn">Inizia</button>
       <p class="muted small">Da 3 a 10 giocatori. Tieni aperta questa pagina: è lei che gestisce la partita.</p>
@@ -817,6 +1309,16 @@ VIEW.lobby = () => {
     try { new QRCode(qr, {text:url, width:160, height:160, colorDark:'#1b0f3b', colorLight:'#ffffff'}); } catch(e){ qr.remove(); }
   } else qr.remove();
   $('#startBtn').onclick = startGame;
+  $('#toHome').onclick = closeRoom;
+  if (H.me){
+    const doRename = () => {
+      const n = $('#hrname').value.trim();
+      if (!n){ $('#hrmsg').className = 'rmsg bad'; $('#hrmsg').textContent = 'Scrivi un nome.'; return; }
+      hostMsg(LOCAL, {t:'rename', name:n});
+    };
+    $('#hrbtn').onclick = doRename;
+    $('#hrname').onkeydown = e => { if (e.key === 'Enter') doRename(); };
+  }
   $('#invite').onclick = async () => {
     const text = `Giochiamo a Tappabuchi! Entra con il codice ${H.code}`;
     try {
@@ -828,6 +1330,7 @@ VIEW.lobby = () => {
   UPD.lobby();
 };
 UPD.lobby = () => {
+  if (!$('#pcount')) return VIEW.lobby();   // la lobby non è sullo schermo: la disegno da zero
   $('#pcount').textContent = `(${H.players.length}/10)`;
   $('#plist').innerHTML = H.players.length ? H.players.map(p => chip(p)).join('') : '<span class="muted">In attesa dei giocatori…</span>';
   const b = $('#startBtn'), miss = 3 - H.players.length;
@@ -944,7 +1447,7 @@ VIEW.winner = () => {
     ${sub ? `<p class="lead">${sub}</p>` : ''}
     ${w.length ? `<div class="${w.length > 1 ? 'grid' : 'vs one'}">${w.map((id, i) => card(m, id, {rev:true, cls:'win big', delay:.35 + i*.15})).join('')}</div>` : ''}
     ${others.length ? `<div class="grid">${others.map((id, i) => card(m, id, {rev:true, cls:'lose', delay:.7 + i*.1})).join('')}</div>` : ''}
-    <div class="row"><button class="btn" id="next">Punti e classifica ▶</button></div>
+    <div class="hbar hnext wide">${hostCdHTML(nextLabel())}<button class="btn" id="next">Vai subito ▶</button></div>
   </div>`;
   $('#next').onclick = showPoints;
 };
@@ -971,7 +1474,7 @@ VIEW.points = () => {
     <div class="gains">${rows}</div>
     <h2 class="huge" style="font-size:clamp(28px,4vw,52px);margin-top:10px">Classifica generale</h2>
     ${boardHTML(gains)}
-    <button class="btn big" id="next">${label}</button>
+    <div class="hbar hnext wide">${hostCdHTML(nextLabel())}<button class="btn" id="next">Vai subito ▶</button></div>
   </div>`;
   $('#next').onclick = nextMatch;
 };
@@ -999,12 +1502,12 @@ UPD.end = () => {};
 const P = {peer:null, conn:null, name:'', code:'', joined:false, lastKey:'', localEnd:0, total:0};
 
 function joinScreen(err){
-  MODE = 'player'; window.onbeforeunload = null;
+  MODE = 'player'; window.onbeforeunload = null; document.body.dataset.mode = '';
   const qs = new URLSearchParams(location.search);
   const code = (qs.get('room') || P.code || load('tb_code') || '').toUpperCase();
   const name = P.name || load('tb_name');
   app.innerHTML = `<div class="screen phone center">
-    <h1 class="logo sm">TAPPA<span>BUCHI</span></h1>
+    ${signHTML(true)}
     <div class="card form">
       ${err ? `<div class="err">${esc(err)}</div>` : ''}
       <label>Codice stanza<input id="jcode" maxlength="4" autocomplete="off" autocapitalize="characters" value="${esc(code)}" placeholder="ABCD"></label>
@@ -1016,60 +1519,130 @@ function joinScreen(err){
     const c = $('#jcode').value.trim().toUpperCase().replace(/[^A-Z]/g, ''), n = $('#jname').value.trim();
     if (c.length !== 4){ $('#jcode').classList.add('shake'); setTimeout(() => $('#jcode') && $('#jcode').classList.remove('shake'), 400); return; }
     if (!n){ $('#jname').classList.add('shake'); setTimeout(() => $('#jname') && $('#jname').classList.remove('shake'), 400); return; }
-    P.code = c; P.name = n; store('tb_code', c); store('tb_name', n);
+    P.code = c; P.name = n; P.resuming = false; store('tb_code', c); store('tb_name', n);
     connect();
   };
   $('#jgo').onclick = go;
   $('#jname').onkeydown = e => { if (e.key === 'Enter') go(); };
-  $('#jback').onclick = () => { cleanupPlayer(); history.replaceState(null, '', location.pathname); home(); };
+  $('#jback').onclick = () => { P.stop = true; cleanupPlayer(); clearSess(); history.replaceState(null, '', location.pathname); home(); };
   if (!code) $('#jcode').focus(); else if (!name) $('#jname').focus();
 }
 
+const MAX_TRIES = 8;              // tentativi di riconnessione automatica
+const SESS_MAX = 3 * 60 * 60 * 1000; // per quanto tempo si può rientrare dopo un crash
+// chiave segreta del dispositivo: l'host riconosce chi rientra anche se la vecchia connessione sembra ancora aperta
+function myTok(){ let t = load('tb_tok'); if (!t){ t = Math.random().toString(36).slice(2) + Date.now().toString(36); store('tb_tok', t); } return t; }
+// partita in corso salvata sul telefono: serve per rientrare dopo un crash o una ricarica della pagina
+function saveSess(){ if (P.code && P.name) store('tb_sess', JSON.stringify({code:P.code, name:P.name, ts:Date.now(), pre:PREFIX})); }
+function loadSess(){ try { const x = JSON.parse(load('tb_sess') || 'null'); return x && x.code && x.name && x.pre === PREFIX && Date.now() - x.ts < SESS_MAX ? x : null; } catch(e){ return null; } }
+function clearSess(){ store('tb_sess', ''); }
+
 function cleanupPlayer(){
   const pe = P.peer;
-  P.conn = null; P.peer = null; P.joined = false; P.lastKey = '';
+  P.conn = null; P.peer = null; P.joined = false; P.lastKey = ''; P.hbOK = false;
   if (pe) try { pe.destroy(); } catch(e){}
 }
 
-function connect(){
+function connect(retry){
   if (typeof Peer === 'undefined') return joinScreen('Impossibile caricare la libreria di rete.');
   cleanupPlayer();
-  app.innerHTML = spinner('Mi collego alla stanza ' + P.code + '…');
+  if (!retry){ P.tries = 0; P.stop = false; app.innerHTML = spinner('Mi collego alla stanza ' + P.code + '…'); }
   const peer = new Peer(); P.peer = peer;
-  const to = setTimeout(() => { if (P.peer === peer && !P.joined){ cleanupPlayer(); joinScreen('Non riesco a collegarmi. Controlla il codice e riprova.'); } }, 15000);
+  // tentativo fallito: in riconnessione si riprova, altrimenti si torna al modulo
+  const fail = msg => {
+    if (P.peer !== peer) return;
+    clearTimeout(to); cleanupPlayer();
+    if (retry) setTimeout(autoReconnect, 2500); else joinScreen(msg);
+  };
+  const to = setTimeout(() => { if (P.peer === peer && !P.joined) fail('Non riesco a collegarmi. Controlla il codice e riprova.'); }, 12000);
   peer.on('open', () => {
     if (P.peer !== peer) return;
     const conn = peer.connect(PREFIX + P.code, {reliable:true}); P.conn = conn;
-    conn.on('open', () => conn.send({t:'join', name:P.name}));
-    conn.on('data', d => playerMsg(d, to));
-    conn.on('close', () => { if (P.conn === conn) lostConn(); });
+    conn.on('open', () => conn.send({t:'join', name:P.name, tok:myTok()}));
+    conn.on('data', d => { P.lastPong = Date.now(); playerMsg(d, to); });
+    conn.on('close', () => { if (P.conn !== conn) return; if (P.joined) lostConn(); else fail('Connessione interrotta. Riprova.'); });
   });
   peer.on('disconnected', () => { try { if (P.peer === peer) peer.reconnect(); } catch(e){} });
   peer.on('error', e => {
     if (P.peer !== peer) return;
-    clearTimeout(to);
-    if (e.type === 'peer-unavailable'){ cleanupPlayer(); joinScreen(P.joined ? 'La stanza è stata chiusa.' : 'Stanza non trovata. Controlla il codice.'); }
-    else if (!P.joined){ cleanupPlayer(); joinScreen('Errore di connessione (' + e.type + '). Riprova.'); }
+    if (e.type === 'peer-unavailable'){
+      // la stanza non esiste (più): in riconnessione riprovo una volta, poi mi arrendo
+      clearTimeout(to); cleanupPlayer();
+      if (retry && P.tries < 2) return setTimeout(autoReconnect, 1500);
+      clearSess(); P.stop = true;
+      return joinScreen(retry ? "La partita non c'è più: l'host ha chiuso la stanza." : 'Stanza non trovata. Controlla il codice.');
+    }
+    if (!P.joined) fail('Errore di connessione (' + e.type + '). Riprova.');
   });
 }
 
+// la connessione è caduta dopo essere entrati: si riprova da soli
 function lostConn(){
   if (MODE !== 'player') return;
-  cleanupPlayer();
-  app.innerHTML = `<div class="screen phone center"><div class="emoji">📡</div><h2>Connessione persa</h2>
-    <p class="lead">Rientra con lo stesso nome: riprendi da dove eri.</p>
-    <button class="btn big" id="rc">Riconnetti</button><button class="link" id="ch">Cambia stanza o nome</button></div>`;
-  $('#rc').onclick = connect;
-  $('#ch').onclick = () => joinScreen();
+  cleanupPlayer(); P.tries = 0;
+  autoReconnect();
 }
+function autoReconnect(){
+  if (MODE !== 'player' || P.stop || P.peer) return;
+  P.tries = (P.tries || 0) + 1;
+  if (P.tries > MAX_TRIES) return reconnectScreen(true);
+  reconnectScreen(false);
+  connect(true);
+}
+function reconnectScreen(gaveUp){
+  const title = gaveUp ? 'Non riesco a riconnettermi' : P.resuming ? 'Rientro nella partita' : 'Connessione persa';
+  const msg = gaveUp ? 'Controlla la connessione internet e riprova: rientrerai con lo stesso nome e riprenderai da dove eri.'
+    : `Mi sto ricollegando alla stanza <b>${esc(P.code)}</b> come <b>${esc(P.name)}</b>…`;
+  app.innerHTML = `<div class="screen phone center"><div class="emoji">${gaveUp ? '😵' : '📡'}</div><h2>${title}</h2>
+    <p class="lead">${msg}</p>
+    ${gaveUp ? '' : `<div class="spinner"></div><p class="muted small">Tentativo ${P.tries} di ${MAX_TRIES}</p>`}
+    <button class="btn big" id="rc">${gaveUp ? 'Riprova' : 'Riprova subito'}</button>
+    <button class="link" id="ch">Esci dalla partita</button></div>`;
+  document.body.dataset.mode = '';
+  $('#rc').onclick = () => { cleanupPlayer(); P.stop = false; P.tries = 0; autoReconnect(); };
+  $('#ch').onclick = () => { P.stop = true; P.resuming = false; cleanupPlayer(); clearSess(); joinScreen(); };
+}
+// riapertura della pagina dopo un crash: rientra da solo nella partita salvata
+function resumeSess(x){
+  MODE = 'player'; P.code = x.code; P.name = x.name; P.stop = false; P.tries = 0; P.resuming = true;
+  autoReconnect();
+}
+
+// controllo di presenza dal telefono: se l'host non risponde da 14 secondi, la connessione è morta
+setInterval(() => {
+  if (MODE !== 'player' || !P.joined || !P.conn) return;
+  if (P.hbOK && Date.now() - (P.lastPong || 0) > 14000){ const c = P.conn; P.conn = null; try { c.close(); } catch(e){} return lostConn(); }
+  send(P.conn, {t:'ping'});
+}, 4000);
+// quando torni sull'app dopo averla lasciata in background: controllo subito che la connessione sia viva
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || MODE !== 'player' || P.stop || !P.code) return;
+  if (P.joined && P.conn && P.conn.open){
+    const t0 = Date.now(); send(P.conn, {t:'ping'});
+    setTimeout(() => {
+      if (MODE === 'player' && P.joined && P.hbOK && P.conn && (P.lastPong || 0) < t0){ const c = P.conn; P.conn = null; try { c.close(); } catch(e){} lostConn(); }
+    }, 3000);
+    return;
+  }
+  if (P.peer) return;            // sta già provando a collegarsi
+  P.tries = 0; autoReconnect();
+});
 
 function playerMsg(d, to){
   if (!d || typeof d !== 'object') return;
-  if (d.t === 'err'){ clearTimeout(to); cleanupPlayer(); return joinScreen(d.msg); }
-  if (d.t === 'joined'){ clearTimeout(to); P.joined = true; P.name = d.name; return; }
+  if (d.t === 'err'){ clearTimeout(to); cleanupPlayer(); clearSess(); P.stop = true; P.resuming = false; return joinScreen(d.msg); }
+  if (d.t === 'joined'){ clearTimeout(to); P.joined = true; P.name = d.name; P.tries = 0; P.resuming = false; store('tb_name', d.name); saveSess(); return; }
+  if (d.t === 'pong'){ P.hbOK = true; return; }
+  if (d.t === 'closed'){ clearTimeout(to); P.stop = true; P.resuming = false; cleanupPlayer(); clearSess(); return joinScreen("L'host ha chiuso la stanza. Chiedigli il nuovo codice per rientrare."); }
+  if (d.t === 'renamed'){ P.name = d.name; store('tb_name', d.name); saveSess(); return; }
+  if (d.t === 'renameErr'){ const e = app.querySelector('[data-rmsg]'); if (e){ e.className = 'rmsg bad'; e.textContent = d.msg; } const b = app.querySelector('[data-rsave]'); if (b) b.disabled = false; return; }
   if (d.t === 'view') renderPlayer(d.v);
 }
 
+function lobbyPlayers(v){
+  return `<div class="muted">Giocatori nella stanza ${esc(v.code)} (${v.players.length})</div>
+    <div class="chips">${v.players.map(x => `<span class="chip ${x.me ? 'mechip' : ''}" style="background:${x.color}">${x.host ? '👑 ' : ''}${esc(x.name)}${x.me ? ' (tu)' : ''}</span>`).join('')}</div>`;
+}
 function statusInner(st){
   const writing = st.filter(x => !x.done), done = st.filter(x => x.done);
   const row = x => `<div class="wrow ${x.done ? 'done' : 'writing'} ${x.me ? 'me' : ''}">
@@ -1083,8 +1656,11 @@ function statusInner(st){
 }
 const statusBlock = v => v.status ? `<div class="wstatus" data-status>${statusInner(v.status)}</div>` : '';
 // aggiorna solo il riquadro "chi sta scrivendo" senza toccare i campi di testo
-function updStatus(root, v){ const el = root.querySelector('[data-status]'); if (el && v.status) el.innerHTML = statusInner(v.status); }
-const viewKey = v => JSON.stringify(Object.assign({}, v, {left:0, status:0}));
+function updStatus(root, v){
+  const el = root.querySelector('[data-status]'); if (el && v.status) el.innerHTML = statusInner(v.status);
+  const pl = root.querySelector('[data-players]'); if (pl && v.players) pl.innerHTML = lobbyPlayers(v);
+}
+const viewKey = v => JSON.stringify(Object.assign({}, v, {left:0, status:0, players:0}));
 
 function playerBody(v, panel){
   if (v.type === 'wait'){
@@ -1104,8 +1680,16 @@ function playerBody(v, panel){
   if (v.type === 'lobby'){
     return `<div class="grow"><div class="emoji">🎉</div><h2 style="font-size:28px">Sei dentro!</h2>
       <p class="lead">Aspetta che l'host avvii la partita.</p>
-      <div class="muted">Giocatori nella stanza ${esc(v.code)} (${v.players.length})</div>
-      <div class="chips">${v.players.map(x => `<span class="chip" style="background:${x.color}">${x.host ? '👑 ' : ''}${esc(x.name)}</span>`).join('')}</div></div>`;
+      <div class="rename">
+        <div class="rcur">Il tuo nome: <b>${esc(v.name)}</b> <button class="btn small ghost" data-redit>✏️ Cambia nome</button></div>
+        <div class="rform" data-rform hidden>
+          <div class="rrow"><input data-rname maxlength="16" autocomplete="off" value="${esc(v.name)}" aria-label="Nuovo nome">
+          <button class="btn small alt" data-rsave>Salva</button></div>
+          <button class="link" data-rcancel>Annulla</button>
+        </div>
+        <div class="rmsg" data-rmsg></div>
+      </div>
+      <div data-players>${lobbyPlayers(v)}</div></div>`;
   }
   if (v.type === 'show'){
     return `<div class="pbanner" style="font-size:22px">${v.mine ? '🥊 È la tua sfida!' : 'Ecco le risposte…'}</div>
@@ -1114,7 +1698,7 @@ function playerBody(v, panel){
       <p class="muted small" style="text-align:center">Tra poco si vota!</p>`;
   }
   if (v.type === 'winner'){
-    return `<div class="pbanner">${esc(v.title)}</div>
+    return `${v.next ? nextBarHTML(v.next) : ''}<div class="pbanner">${esc(v.title)}</div>
       ${v.sub ? `<p class="lead" style="text-align:center">${esc(v.sub)}</p>` : ''}
       ${v.mine ? `<div class="mymsg">${esc(v.mine)}</div>` : ''}
       <div class="opts">${v.cards.map(c => `<div class="pcard ${c.win ? 'win' : 'lose'}" style="--c:${c.color}">
@@ -1124,7 +1708,7 @@ function playerBody(v, panel){
         ${c.voters.length ? `<div class="voters">Votato da: ${c.voters.map(esc).join(', ')}</div>` : ''}</div></div>`).join('')}</div>`;
   }
   if (v.type === 'board'){
-    return `<div class="pbanner">${esc(v.title)}</div>
+    return `${v.next ? nextBarHTML(v.next) : ''}<div class="pbanner">${esc(v.title)}</div>
       ${v.sub ? `<p class="lead" style="text-align:center">${esc(v.sub)}</p>` : ''}
       ${v.gains.length ? `<h3>Punti della sfida</h3><div class="gains">${v.gains.map(g => `<div class="gain small ${g.me ? 'me' : ''}">
         <span class="aname" style="background:${g.color}">${esc(g.name)}</span>
@@ -1170,6 +1754,22 @@ function modeOf(v){
 function setMode(v){ document.body.dataset.mode = modeOf(v); }
 
 function wirePlayer(root, v, sendFn){
+  if (v.type === 'lobby'){
+    const form = root.querySelector('[data-rform]'), cur = root.querySelector('.rcur'), inp = root.querySelector('[data-rname]');
+    const msg = root.querySelector('[data-rmsg]'), save = root.querySelector('[data-rsave]');
+    root.querySelector('[data-redit]').onclick = () => { form.hidden = false; cur.hidden = true; msg.textContent = ''; inp.focus(); inp.select(); };
+    root.querySelector('[data-rcancel]').onclick = () => { form.hidden = true; cur.hidden = false; msg.textContent = ''; inp.value = v.name; };
+    const go = () => {
+      const n = inp.value.trim();
+      if (!n){ msg.className = 'rmsg bad'; msg.textContent = 'Scrivi un nome.'; inp.focus(); return; }
+      if (n === v.name){ form.hidden = true; cur.hidden = false; return; }
+      save.disabled = true; msg.className = 'rmsg'; msg.textContent = 'Salvo…';
+      sendFn({t:'rename', name:n});
+    };
+    save.onclick = go;
+    inp.onkeydown = e => { if (e.key === 'Enter') go(); };
+    return;
+  }
   if (v.type === 'answer'){
     const q = v.prompts[0];
     const ins = [...root.querySelectorAll('.ans')];
@@ -1196,6 +1796,7 @@ function wirePlayer(root, v, sendFn){
 }
 
 function renderPlayer(v){
+  if (Date.now() - (P.sessTs || 0) > 30000){ P.sessTs = Date.now(); saveSess(); }
   P.localEnd = v.left ? Date.now() + v.left : 0; P.total = v.total || 0;
   const key = viewKey(v);
   if (key === P.lastKey){ updStatus(app, v); return; }
@@ -1219,7 +1820,13 @@ setInterval(() => {
 }, 200);
 
 /* ===================== AVVIO ===================== */
-if (new URLSearchParams(location.search).get('room')) joinScreen(); else home();
+(() => {
+  const room = (new URLSearchParams(location.search).get('room') || '').toUpperCase();
+  const x = loadSess();
+  if (x && (!room || room === x.code)) resumeSess(x);
+  else if (room) joinScreen();
+  else home();
+})();
 </script>
 </body>
 </html>
