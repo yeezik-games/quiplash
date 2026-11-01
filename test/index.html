@@ -323,6 +323,21 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
   .sign .bulb{animation:bulb 1s linear var(--d,0s) infinite!important}
   .sign{animation:signglow 2.4s ease-in-out infinite alternate!important}
   .signlogo span{animation:flicker 5s linear infinite!important}}
+/* stanza dell'host sul telefono: tutto centrato (su PC restano le due colonne) */
+@media (max-width:900px){
+  .lobby{max-width:520px;margin:0 auto}
+  .lobbyL{align-items:center;text-align:center}
+  .lobbyL > .backhome{align-self:flex-start}
+  .lobbyL .signwrap.compact{margin:6px auto 0}
+  .joinbox{flex-direction:column;justify-content:center;text-align:center;width:100%;box-sizing:border-box;gap:12px;padding:18px 16px}
+  .joinbox .url{max-width:100%;margin:6px auto 0}
+  #plist{justify-content:center!important}
+  #alist{text-align:center}
+  .lobbyL .row{justify-content:center!important}
+  .lobbyL .rename.host,.lobbyL .manage{width:100%;box-sizing:border-box;text-align:left}
+  .manage h3{text-align:center}
+  .lobbyR{text-align:left}
+}
 </style>
 </head>
 <body>
@@ -634,6 +649,7 @@ const PATCH_NOTES = [
     'Pubblico: chi arriva a partita iniziata o a stanza piena guarda e vota',
     'L\'host può far uscire un giocatore o passare il ruolo di host a un altro',
     'Suoni e vibrazione, che si spengono in fondo alla pagina',
+    'Stanza dell\'host più ordinata sul telefono: logo, QR e codice al centro',
     'Tutte le novità diventano ufficiali'
   ]},
   {date:'31 ottobre 2026', from:'1.8', to:'1.16', items:[
