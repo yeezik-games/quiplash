@@ -642,10 +642,11 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.18';
+const VERSION = '1.19';
 // Un blocco per giorno (il più recente in cima). Aggiornamento nello stesso giorno: aggiungi la riga in cima al blocco e alza "to".
 const PATCH_NOTES = [
-  {date:'1 novembre 2026', from:'1.17', to:'1.18', items:[
+  {date:'1 novembre 2026', from:'1.17', to:'1.19', items:[
+    'Il presentatore legge ad alta voce frasi, risposte e vincitori (di base sul dispositivo dell\'host)',
     'Pubblico: chi arriva a partita iniziata o a stanza piena guarda e vota',
     'L\'host può far uscire un giocatore o passare il ruolo di host a un altro',
     'Suoni e vibrazione, che si spengono in fondo alla pagina',
@@ -697,8 +698,12 @@ function openNotes(){
   const paint = () => { sb.textContent = SND.on ? '🔊 Suoni attivi' : '🔇 Suoni spenti'; sb.setAttribute('aria-pressed', SND.on ? 'true' : 'false'); };
   sb.onclick = () => { SND.on = !SND.on; store('tb_sound', SND.on ? 'on' : 'off'); paint(); if (SND.on) SFX.pop(); };
   f.appendChild(sb);
+  const vb = document.createElement('button');   // nascosto se il dispositivo non ha la sintesi vocale (vedi paintVoice)
+  vb.className = 'vbtn voicebtn'; vb.hidden = true;
+  vb.onclick = () => setVoice(!voiceOn());
+  f.appendChild(vb);
   document.body.appendChild(f);
-  setTimeout(paint, 0);
+  setTimeout(() => { paint(); paintVoice(); }, 0);
 })();
 
 const COLORS = ['#ffd23f','#ff4fa3','#3ee6d0','#a99bff','#ff8a3d','#7ee36b','#4fb3ff','#ff6b6b','#f6a5ff','#c2f04d'];
@@ -735,6 +740,19 @@ function showError(msg){
 let MODE = null;
 
 /* ===================== HOME ===================== */
+// accende/spegne il presentatore su questo dispositivo
+function paintVoice(){
+  const on = voiceOn();
+  document.querySelectorAll('.voicebtn').forEach(b => { b.hidden = !VOICE.ok; b.textContent = on ? '🎙️ Presentatore attivo' : '🎙️ Presentatore spento'; b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+  const c = document.getElementById('voiceChk'); if (c) c.checked = on;
+}
+function setVoice(on){
+  store('tb_voice', on ? 'on' : 'off'); paintVoice();
+  if (on){ VOICE.unlocked = true; say(['Ciao! Sono il presentatore di Tappabuchi.']); } else hush();
+}
+// il valore di base dipende dal ruolo (host sì, giocatori no): aggiorno il pulsante quando cambia schermata
+new MutationObserver(() => requestAnimationFrame(paintVoice)).observe(document.getElementById('app'), {childList:true});
+
 // insegna animata del gioco: la stessa in homepage e nelle altre schermate
 function signHTML(compact){
   return `<div class="signwrap${compact ? ' compact' : ''}">
@@ -781,6 +799,7 @@ addEventListener('resize', () => requestAnimationFrame(placeAllBulbs));
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeAllBulbs);
 
 function home(){
+  hush();
   document.body.dataset.mode = '';
   MODE = null; window.onbeforeunload = null;
   app.innerHTML = `<div class="screen center home">
@@ -1135,7 +1154,12 @@ function nextMatch(){
   // 1) le risposte compaiono una alla volta
   H.phase = 'show';
   renderHost(); broadcast();
-  setTimer(1 + m.order.length * revealStep(m) + 1.2, startVote, false);
+  let showSec = 1 + m.order.length * revealStep(m) + 1.2;
+  if (voiceOn()){   // presentatore acceso: tempo per leggere frase e risposte (circa 2,6 parole al secondo)
+    const words = (m.prompt + ' ' + m.order.map(id => m.answers[id].join(' ')).join(' ')).split(/\s+/).length + m.order.length * 2;
+    showSec = Math.min(35, Math.max(showSec, 1.5 + words / 2.6));
+  }
+  setTimer(showSec, startVote, false);
 }
 const revealStep = m => m.final ? 1.4 : 1.8;
 // 2) votazione
@@ -1438,6 +1462,7 @@ VIEW.lobby = () => {
       <label>Frasi extra (facoltativo: le frasi le sceglie già il gioco). Una per riga, ___ per ogni buco
         <textarea id="custom" rows="6" placeholder="Il peggior regalo per ___ è ___">${esc(H.customRaw)}</textarea></label>
       <label class="check"><input type="checkbox" id="onlyCustom" ${H.onlyCustom ? 'checked' : ''}> Usa solo i miei prompt</label>
+      ${VOICE.ok ? `<label class="check"><input type="checkbox" id="voiceChk" ${voiceOn() ? 'checked' : ''}> 🎙️ Presentatore che legge ad alta voce (su questo dispositivo)</label>` : ''}
     </div>
   </div></div>`;
   const qr = $('#qr');
@@ -1446,6 +1471,7 @@ VIEW.lobby = () => {
   } else qr.remove();
   $('#startBtn').onclick = startGame;
   $('#toHome').onclick = closeRoom;
+  if ($('#voiceChk')) $('#voiceChk').onchange = e => setVoice(e.target.checked);
   $('#manage').onclick = e => {
     const b = e.target.closest('button[data-act]'); if (!b) return;
     if (b.dataset.act === 'kick') kick(b.dataset.id); else makeHost(b.dataset.id);
@@ -1958,6 +1984,60 @@ function renderPlayer(v){
   wirePlayer(app, v, d => send(P.conn, d));
 }
 
+/* ===================== PRESENTATORE ===================== */
+// legge ad alta voce con la voce italiana del dispositivo. Di base parla solo il dispositivo dell'host
+// (in una stanza con tanti telefoni sarebbe un'eco); chi gioca da remoto lo accende in fondo alla pagina.
+const VOICE = {ok: typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined', v:null, unlocked:false};
+function voiceOn(){ if (!VOICE.ok) return false; const x = load('tb_voice'); return x ? x === 'on' : MODE === 'host'; }
+function pickVoice(){
+  try {
+    const vs = speechSynthesis.getVoices().filter(v => /^it/i.test(v.lang));
+    VOICE.v = vs.find(v => /google/i.test(v.name)) || vs.find(v => /alice|federica|luca|elsa|paola|isabella/i.test(v.name)) || vs[0] || null;
+  } catch(e){}
+}
+if (VOICE.ok){ pickVoice(); try { speechSynthesis.addEventListener('voiceschanged', pickVoice); } catch(e){} }
+const cleanSpeech = t => String(t || '').replace(/\b[A-ZÀ-Ý]{4,}\b/g, w => w.toLowerCase()).replace(/_{3}/g, ' … ').replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '').replace(/\s+/g, ' ').trim();
+function say(parts, interrupt = true){
+  if (!voiceOn()) return;
+  try {
+    if (interrupt) speechSynthesis.cancel();
+    parts.map(cleanSpeech).filter(Boolean).forEach(t => {
+      const u = new SpeechSynthesisUtterance(t);
+      u.lang = 'it-IT'; if (VOICE.v) u.voice = VOICE.v; u.rate = 1.05; u.pitch = 1.05;
+      speechSynthesis.speak(u);
+    });
+  } catch(e){}
+}
+function hush(){ try { if (VOICE.ok) speechSynthesis.cancel(); } catch(e){} }
+// su iPhone la voce si attiva solo dopo un primo tocco
+document.addEventListener('pointerdown', () => {
+  if (!VOICE.ok || VOICE.unlocked || !voiceOn()) return;
+  VOICE.unlocked = true;
+  try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch(e){}
+}, {passive:true});
+const ORD = ['Prima', 'Seconda', 'Terza', 'Quarta', 'Quinta', 'Sesta', 'Settima', 'Ottava', 'Nona', 'Decima'];
+const readAnswers = list => list.map((parts, i) => (list.length > 2 ? ORD[i] + ' risposta: ' : i ? 'Oppure: ' : '') + parts.join(', ') + '.');
+const endOfRound = next => /Round|Classifica/.test(next || '');
+// cosa dice il presentatore a ogni nuova schermata
+function narrate(v){
+  if (v.type === 'wait' && /^Round/.test(v.title || '')) say([v.title + '!', v.msg]);
+  else if (v.type === 'show') say([v.prompt, ...readAnswers(v.answers.map(a => a.parts))]);
+  else if (v.type === 'vote' || v.type === 'tally') say(['Votate!'], false);
+  else if (v.type === 'winner') say([v.title, v.sub]);
+  else if (v.type === 'board' && v.final) say([v.title]);
+  else if (v.type === 'board' && endOfRound(v.next) && v.board && v.board[0]) say([`In testa c'è ${v.board[0].name}, con ${v.board[0].score} punti.`], false);
+}
+// lo stesso, per lo schermo dell'host in modalità "solo schermo"
+function narrateScreen(){
+  const m = cur();
+  if (H.phase === 'intro') say([(H.round < 3 ? 'Round ' + H.round : 'Round finale') + '!', introText()]);
+  else if (H.phase === 'show' && m) say([m.prompt, ...readAnswers(m.order.map(id => m.answers[id]))]);
+  else if (H.phase === 'vote') say(['Votate!'], false);
+  else if (H.phase === 'winner' && m){ const wt = winnerText(m); say([wt.title, wt.sub]); }
+  else if (H.phase === 'points' && endOfRound(nextLabel())){ const s0 = sorted()[0]; if (s0) say([`In testa c'è ${s0.name}, con ${s0.score} punti.`], false); }
+  else if (H.phase === 'end'){ const s1 = sorted(), top = s1.filter(x => x.score === s1[0].score); say([top.length > 1 ? 'Pareggio finale!' : top[0].name + ' vince la partita!']); }
+}
+
 /* ===================== SUONI E VIBRAZIONE ===================== */
 // suoni generati al momento (niente file da scaricare); si spengono dal pulsante in fondo alla pagina
 const SND = {on: load('tb_sound') !== 'off', ctx:null, noise:null, last:'', cur:'', tick:0};
@@ -2006,6 +2086,7 @@ function soundFor(v){
   SND.cur = v.status ? 'answer' : v.type;
   const k = v.type + '|' + (v.prompt || '') + '|' + (v.title || '') + '|' + (v.final ? 1 : 0);
   if (k === SND.last) return; SND.last = k;
+  narrate(v);
   if (v.type === 'show'){ SFX.jingle(); v.answers.forEach((a, i) => SFX.ding(0.8 + i * v.step)); }
   else if (v.type === 'vote'){ SFX.pop(); vibrate([80, 60, 80]); }
   else if (v.type === 'winner'){
@@ -2021,6 +2102,7 @@ function screenSound(){
   if (H.me) return;
   const m = cur();
   SND.cur = H.phase;
+  narrateScreen();
   if (H.phase === 'intro') SFX.jingle();
   else if (H.phase === 'show' && m){ SFX.jingle(); m.order.forEach((id, i) => SFX.ding(1 + i * revealStep(m))); }
   else if (H.phase === 'vote') SFX.pop();
