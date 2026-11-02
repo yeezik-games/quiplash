@@ -300,6 +300,53 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
 .usug{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .ugchip{border:2px solid #e3dcff;background:#fff;border-radius:99px;padding:6px 10px;font:700 14px Rubik,sans-serif;color:var(--ink);cursor:pointer}
 .urules{margin:0;padding-left:18px;color:#6b5b9a;font-size:13px;line-height:1.5}
+.accme{display:inline-flex;align-items:center;gap:8px;font:600 16px Rubik,sans-serif;color:#fff;background:none;border:0;padding:4px 6px 4px 0;cursor:pointer;border-radius:12px}
+.accme:hover b{text-decoration:underline}
+.cntb{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:var(--pink);color:#fff;font-size:12px;font-weight:800;margin-left:4px}
+.accav.lg{width:52px;height:52px;font-size:22px}
+.accav.xl{width:72px;height:72px;font-size:32px}
+.social{width:100%;display:flex;flex-direction:column;gap:10px}
+.invban{display:flex;align-items:center;gap:12px;background:#fff;color:var(--ink);border-radius:18px;padding:12px 14px;border:3px solid var(--yellow);box-shadow:0 8px 20px rgba(0,0,0,.25);text-align:left;animation:pop .3s both}
+.invban .ib{flex:1;min-width:0}.invban .ib b{display:block}.invban small{color:#6b5b9a}
+.sechead{display:flex;align-items:center;justify-content:space-between}
+.sechead h3{margin:0;font-size:17px}
+.fstrip{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}
+.fbub{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;color:#fff;font:700 13px Rubik,sans-serif;cursor:pointer;min-width:64px}
+.fbub i{position:absolute;top:38px;left:calc(50% + 14px);width:14px;height:14px;border-radius:50%;background:#7ee36b;border:3px solid var(--bg)}
+.fbub i.busy{background:var(--yellow)}
+.fbub small{color:var(--cyan);font-size:11px;font-weight:800}
+.addfr{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.08);border:2px dashed rgba(255,255,255,.3);border-radius:18px;padding:14px;color:#fff;font:600 15px Rubik,sans-serif;text-align:left;cursor:pointer}
+.addfr b{display:block}.addfr small{color:#cfc6ff}
+.topline{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin-bottom:6px}
+.topline .ttl{font-size:22px}
+.fsearch{display:flex;flex-direction:row;align-items:center;gap:8px;background:#fff;color:#6b5b9a;border-radius:16px;padding:0 14px}
+.fsearch input{border:0;padding:14px 0;background:none;flex:1;min-width:0}
+.fsearch input:focus{outline:none}
+.fsearch:focus-within{box-shadow:0 0 0 3px var(--cyan)}
+.flist{display:flex;flex-direction:column;gap:8px}
+.frow{position:relative;display:flex;align-items:center;gap:12px;background:#fff;color:var(--ink);border-radius:16px;padding:10px 12px;text-align:left}
+.frow.dim{opacity:.72}
+.frow.req{border:3px solid var(--pink)}
+.frow .fi{flex:1;min-width:0}.frow .fi b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.frow .fi small{color:#6b5b9a;font-size:13px}
+.frow .ondot{position:absolute;left:36px;top:34px;width:12px;height:12px;border-radius:50%;background:#7ee36b;border:2px solid #fff}
+.frow .ondot.busy{background:#f5a623}
+.frow .btn.small{flex:none}
+.xbtn{flex:none;width:36px;height:36px;border-radius:50%;border:0;background:#eee8ff;color:var(--ink);font:800 14px Rubik,sans-serif;cursor:pointer}
+.ftag{flex:none;font-size:13px;font-weight:800;padding:6px 10px;border-radius:99px;background:#eee8ff;color:#6b5b9a}
+.ftag.ok{background:#dff7e4;color:#1f8a3a}.ftag.gold{background:#fff3c4;color:#8a6a00}
+.btn.ghost2{background:#fff;border:2px solid #e3dcff;box-shadow:none}
+.fempty{color:#cfc6ff;font-size:14px;margin:2px 0 6px}
+.pinkh{color:var(--pink)}
+.invfr{width:100%;text-align:left;margin-top:6px}
+.invfr h3{margin:8px 0}
+.invhint{margin:6px 0}
+.phead{display:flex;align-items:center;gap:16px}
+.phead .pinfo b{font-size:24px;display:block}.phead small{color:#6b5b9a}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.scard{background:#fff;color:var(--ink);border:0;border-radius:18px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;font:600 13px Rubik,sans-serif;cursor:pointer}
+.scard b{font-size:28px;font-weight:800}.scard b.c{color:#14a594}.scard b.p{color:var(--pink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toast{position:fixed;left:16px;right:16px;bottom:24px;margin:0 auto;width:fit-content;z-index:200;display:flex;align-items:center;gap:12px;background:#fff;color:var(--ink);font-weight:700;border-radius:16px;padding:12px 16px;box-shadow:0 12px 30px rgba(0,0,0,.4);max-width:calc(100vw - 32px);animation:pop .25s both}
 .manage{display:flex;flex-direction:column;gap:8px;width:100%;max-width:520px}
 .manage h3{margin:6px 0 2px}
 .mrow{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:14px;padding:8px 10px;flex-wrap:wrap}
@@ -707,7 +754,8 @@ const VERSION = '1.20';
 // Un blocco per giorno (il più recente in cima). Aggiornamento nello stesso giorno: aggiungi la riga in cima al blocco e alza "to".
 const PATCH_NOTES = [
   {date:'2 novembre 2026', from:'1.20', to:'1.20', items:[
-    'Account come in Sintonia: accedi con email o gioca come ospite (anon_nome)'
+    'Account come in Sintonia: accedi con email o gioca come ospite (anon_nome)',
+    'Amici e profilo condivisi con Sintonia: richieste di amicizia, chi è online, inviti nella stanza con un tocco'
   ]},
   {date:'1 novembre 2026', from:'1.17', to:'1.19', items:[
     'Il presentatore legge ad alta voce frasi, risposte e vincitori (di base sul dispositivo dell\'host)',
@@ -875,6 +923,7 @@ function home(){
       <button class="btn big homebtn" id="bHost"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Crea una partita</button>
       <button class="btn big alt homebtn" id="bJoin"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Entra con un codice</button>
     </div>
+    ${homeSocialHTML()}
     <div class="homechips"><span>3–10 giocatori</span><span>Dal telefono</span><span>Senza app</span></div>
     <section class="howto">
       <h2>Come si gioca</h2>
@@ -889,7 +938,7 @@ function home(){
   </div>`;
   $('#bHost').onclick = hostSetup;
   $('#bJoin').onclick = () => joinScreen();
-  wireAccBar();
+  wireAccBar(); wireSocial(app);
 }
 
 /* ===================== ACCOUNT: schermate ===================== */
@@ -897,12 +946,15 @@ const ICO_USER = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24
 // barra in alto nella homepage
 function accBarHTML(){
   if (!sbc) return '';
-  if (ACC.profile) return `<div class="accbar"><span class="accme"><span class="accav" style="--c:${esc(ACC.profile.color || '#ffd23f')}">${esc(ACC.profile.username[0].toUpperCase())}</span><b>${esc(ACC.profile.username)}</b>${badge(ACC.profile.id)}</span><button class="link acclink" data-acc="logout">Esci</button></div>`;
+  if (ACC.profile) return `<div class="accbar"><button class="accme" data-acc="profile" aria-label="Il tuo profilo">${avHTML(ACC.profile)}<b>${esc(ACC.profile.username)}</b>${badge(ACC.profile.id)}</button><button class="btn small ghost accbtn" data-acc="friends">${ICO_PEOPLE}Amici${FR.incoming.length ? `<span class="cntb">${FR.incoming.length}</span>` : ''}</button></div>`;
   return `<div class="accbar"><span class="muted small">${guestSaved.name ? 'Giochi come <b style="color:#fff">' + esc(guestSaved.name) + '</b>' : 'Stai giocando come ospite'}</span><button class="btn small ghost accbtn" data-acc="login">${ICO_USER}Accedi</button></div>`;
 }
 function wireAccBar(){
   document.querySelectorAll('[data-acc]').forEach(b => b.onclick = async () => {
-    if (b.dataset.acc === 'login') openLogin();
+    const a = b.dataset.acc;
+    if (a === 'login') openLogin();
+    else if (a === 'friends') friendsScreen();
+    else if (a === 'profile') profileScreen();
     else if (confirm("Uscire dall'account?")){ try { await sbc.auth.signOut(); } catch(e){} }
   });
 }
@@ -986,20 +1038,20 @@ function openLogin(){
   setTimeout(() => { const e = m.querySelector('#lemail'); if (e) e.focus(); }, 100);
 }
 // primo accesso: scelta del nome utente (univoco, come in Sintonia)
-function usernameScreen(){
-  MODE = null; ACC.screen = 'username';
+function usernameScreen(changing){
+  MODE = null; ACC.screen = changing ? 'rename' : 'username';
   app.innerHTML = `<div class="screen phone center">
     ${signHTML(true)}
     <div class="card form">
-      <h3>Scegli il tuo nome utente</h3>
+      <h3>${changing ? 'Cambia nome utente' : 'Scegli il tuo nome utente'}</h3>
       <p class="muted small" style="margin:0;color:#6b5b9a">Ti serve per giocare e farti riconoscere. È solo tuo e vale anche per Sintonia e gli altri giochi Yeezik.</p>
       <label>Nome utente<span class="uwrap"><input id="uname" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="es. yeezik"><span id="ustate" class="ustate"></span></span></label>
       <p class="rmsg" id="umsg"></p>
       <div id="usug" class="usug"></div>
-      <ul class="urules"><li>Da 3 a 16 caratteri</li><li>Lettere minuscole, numeri, punto e trattino basso</li></ul>
-      <button class="btn big" id="usave" disabled>Continua</button>
+      <ul class="urules"><li>Da 3 a 16 caratteri</li><li>Lettere minuscole, numeri, punto e trattino basso</li><li>Puoi cambiarlo una volta ogni 30 giorni</li></ul>
+      <button class="btn big" id="usave" disabled>${changing ? 'Salva' : 'Continua'}</button>
     </div>
-    <button class="link" id="uout">Non sei tu? Esci dall'account</button></div>`;
+    <button class="link" id="uout">${changing ? '← Indietro' : "Non sei tu? Esci dall'account"}</button></div>`;
   const i = $('#uname'); let t = null, seq = 0;
   const set = (ok, msg, sug) => {
     $('#ustate').textContent = ok === true ? '✓' : ok === false ? '✕' : '';
@@ -1011,6 +1063,7 @@ function usernameScreen(){
   };
   const check = async () => {
     const v = i.value, my = ++seq;
+    if (changing && v === ACC.profile.username) return set(null, 'È il tuo nome attuale');
     if (v.length < 3) return set(null, v ? 'Almeno 3 caratteri' : '');
     if (/^anon_/.test(v)) return set(false, 'I nomi che iniziano con anon_ sono per gli ospiti');
     set(null, 'Controllo…');
@@ -1026,31 +1079,292 @@ function usernameScreen(){
   $('#usave').onclick = async () => {
     const v = i.value; $('#usave').disabled = true;
     const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-    const res = await sbc.from('profiles').insert({id:ACC.session.user.id, username:v, color}).select().single();
-    if (res.error){ set(false, res.error.code === '23505' ? `${v} è appena stato preso, scegline un altro` : 'Non riuscito, riprova'); return; }
-    ACC.profile = res.data; home();
+    const res = changing ? await sbc.from('profiles').update({username:v}).eq('id', ACC.profile.id).select().single()
+      : await sbc.from('profiles').insert({id:ACC.session.user.id, username:v, color}).select().single();
+    if (res.error){ const m = res.error.message || ''; set(false, res.error.code === '23505' ? `${v} è appena stato preso, scegline un altro` : /verificati/.test(m) ? 'Gli account verificati non possono cambiare nome utente' : /30 giorni/.test(m) ? 'Puoi cambiare il nome utente una volta ogni 30 giorni' : 'Non riuscito, riprova'); return; }
+    ACC.profile = res.data;
+    if (changing){ toast('Nome utente aggiornato'); profileScreen(); } else { startSocial(); home(); }
   };
-  $('#uout').onclick = async () => { try { await sbc.auth.signOut(); } catch(e){} };
+  $('#uout').onclick = changing ? profileScreen : async () => { try { await sbc.auth.signOut(); } catch(e){} };
   setTimeout(() => i.focus(), 100);
 }
 // sessione: carico il profilo e aggiorno solo le schermate fuori dalla partita
 async function onSession(sess){
   const prev = ACC.session && ACC.session.user && ACC.session.user.id;
   ACC.session = sess || null;
-  if (!sess){ ACC.profile = null; refreshAccScreens(); return; }
+  if (!sess){ ACC.profile = null; stopSocial(); refreshAccScreens(); return; }
   if (ACC.profile && prev === sess.user.id) return;
   const {data, error} = await sbc.from('profiles').select('*').eq('id', sess.user.id).maybeSingle();
   if (error) return;
   ACC.profile = data || null;
   if (!ACC.profile){ if (['home', 'setup', 'join', ''].includes(ACC.screen) && !P.joined && MODE !== 'host') usernameScreen(); return; }
-  refreshAccScreens();
+  startSocial(); refreshAccScreens();
 }
 function refreshAccScreens(){
   if (MODE === 'host' || P.joined || P.peer) return;            // in partita non tocco niente
+  if (ACC.screen === 'friends' || ACC.screen === 'profile'){ if (!ACC.profile) return home(); return ACC.screen === 'friends' ? drawFriendLists() : profileScreen(); }
   if (ACC.screen === 'home' || ACC.screen === 'username') home();
   else if (ACC.screen === 'setup') hostSetup();
   else if (ACC.screen === 'join') joinScreen();
 }
+/* ===================== AMICI, INVITI, PROFILO (condivisi con Sintonia) ===================== */
+const GAME = IS_TEST ? 'tappabuchi_test' : 'tappabuchi';
+const GAMES = {
+  sintonia:{name:'Sintonia', url:'https://yeezikdev.github.io/sintonia/', q:'r'},
+  tappabuchi:{name:'Tappabuchi', url:'https://yeezikdev.github.io/quiplash/', q:'room'},
+  tappabuchi_test:{name:'Tappabuchi (prova)', url:'https://yeezikdev.github.io/quiplash/test/', q:'room'}
+};
+const ICO_PEOPLE = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M17 11a3 3 0 1 0 0-6M22 21c0-3-2-5-5-5"/></svg>';
+const FR = {accepted:[], incoming:[], outgoing:[]};
+let INV = [], ONLINE = {}, PROF = {}, presCh = null, userCh = null, presRoom = undefined, presTimer = null;
+const invitedHere = new Set(); let invitedRoom = '';
+const avHTML = (p, cls = '') => `<span class="accav ${cls}" style="--c:${esc(p.color || '#ffd23f')}">${esc(((p.username || p.name || '?')[0] || '?').toUpperCase())}</span>`;
+const fname = f => `${esc(f.username)}${badge(f.id)}`;
+const ago = t => { const s = (Date.now() - new Date(t).getTime()) / 1000; if (s < 60) return 'adesso'; if (s < 3600) return Math.floor(s / 60) + ' min fa'; if (s < 86400) return Math.floor(s / 3600) + ' h fa'; const d = Math.floor(s / 86400); return d === 1 ? 'ieri' : d + ' giorni fa'; };
+function toast(msg, ms = 2600, act){
+  let t = document.getElementById('toast'); if (t) t.remove();
+  t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; t.setAttribute('role', 'status');
+  t.innerHTML = `<span>${esc(msg)}</span>${act ? `<button class="btn small">${esc(act.label)}</button>` : ''}`;
+  if (act) t.querySelector('button').onclick = () => { t.remove(); act.fn(); };
+  document.body.appendChild(t); setTimeout(() => t.remove(), act ? Math.max(ms, 7000) : ms);
+}
+// la stanza in cui mi trovo adesso (per farmi trovare dagli amici)
+const myRoom = () => MODE === 'host' && H.code ? H.code : (P.joined && P.code ? P.code : null);
+// stato di un amico: online? in quale gioco/stanza?
+function fstate(id){
+  const o = ONLINE[id]; if (!o) return {on:false};
+  if (o.game === GAME && o.tb_room) return {on:true, room:o.tb_room, here:true, txt:'In una partita · stanza ' + o.tb_room};
+  if (o.game === GAME) return {on:true, txt:'Online'};
+  if (o.game && GAMES[o.game]) return {on:true, txt:o.tb_room ? 'Gioca a ' + GAMES[o.game].name : 'Online su ' + GAMES[o.game].name};
+  if (o.room) return {on:true, txt:'Gioca a Sintonia'};
+  return {on:true, txt:'Online su Sintonia'};
+}
+
+async function fetchProfiles(ids){
+  const need = [...new Set(ids)].filter(x => x && !PROF[x]);
+  if (need.length){ const {data} = await sbc.from('profiles').select('id,username,color').in('id', need); (data || []).forEach(p => PROF[p.id] = p); }
+}
+async function loadFriends(){
+  if (!ACC.profile) return;
+  const {data} = await sbc.from('friendships').select('*');
+  const rows = data || [], uid = ACC.profile.id;
+  await fetchProfiles(rows.map(r => r.requester === uid ? r.addressee : r.requester));
+  const pp = id => PROF[id];
+  FR.accepted = rows.filter(r => r.status === 'accepted').map(r => pp(r.requester === uid ? r.addressee : r.requester)).filter(Boolean).sort((a, b) => a.username.localeCompare(b.username));
+  FR.incoming = rows.filter(r => r.status === 'pending' && r.addressee === uid).map(r => pp(r.requester)).filter(Boolean);
+  FR.outgoing = rows.filter(r => r.status === 'pending' && r.requester === uid).map(r => pp(r.addressee)).filter(Boolean);
+}
+async function loadInvites(){
+  if (!ACC.profile) return;
+  const since = new Date(Date.now() - 3 * 3600e3).toISOString();
+  const {data} = await sbc.from('invites').select('*').eq('to_id', ACC.profile.id).gte('created_at', since).order('created_at', {ascending:false}).limit(10);
+  INV = (data || []).filter(i => GAMES[i.game || 'sintonia']); await fetchProfiles(INV.map(i => i.from_id));
+}
+// avvio: amici, inviti, chi è online, notifiche in tempo reale
+function startSocial(){
+  if (!sbc || !ACC.profile || presCh) return;
+  const me = ACC.profile.id;
+  Promise.all([loadFriends(), loadInvites()]).then(socialChanged);
+  try {
+    presCh = sbc.channel('yeezik-online', {config:{presence:{key:me}}});
+    presCh.on('presence', {event:'sync'}, () => {
+      const st = presCh.presenceState(), m = {};
+      for (const [k, arr] of Object.entries(st)){
+        const here = arr.find(x => x.game === GAME && x.tb_room), last = arr[arr.length - 1] || {};
+        m[k] = here ? {game:GAME, tb_room:here.tb_room} : {game:last.game || null, tb_room:last.tb_room || null, room:arr.map(x => x.room).find(Boolean) || null};
+      }
+      ONLINE = m; socialChanged();
+    }).subscribe(s => { if (s === 'SUBSCRIBED'){ presRoom = undefined; trackPresence(); } });
+    userCh = sbc.channel('tb-user-' + me)
+      .on('postgres_changes', {event:'INSERT', schema:'public', table:'invites', filter:'to_id=eq.' + me}, async ({new:inv}) => {
+        if (!GAMES[inv.game || 'sintonia']) return;
+        await fetchProfiles([inv.from_id]); INV = [inv, ...INV.filter(x => x.id !== inv.id)];
+        const f = PROF[inv.from_id], who = f ? f.username : 'Un amico', g = GAMES[inv.game || 'sintonia'];
+        try { navigator.vibrate && navigator.vibrate([30, 60, 30]); } catch(e){}
+        try { SFX && SFX.join && SFX.join(); } catch(e){}
+        if (myRoom()) toast(`${who} ti invita ${inv.game === GAME ? 'nella stanza ' + inv.room_code : 'a ' + g.name}`, 6000);
+        else toast(`${who} ti ha invitato a ${inv.game === GAME ? 'giocare' : g.name}!`, 7000, {label:'Entra', fn:() => acceptInvite(inv.id)});
+        socialChanged();
+      })
+      .on('postgres_changes', {event:'*', schema:'public', table:'friendships', filter:'addressee=eq.' + me}, async ev => { await loadFriends(); if (ev.eventType === 'INSERT') toast('Nuova richiesta di amicizia'); socialChanged(); })
+      .on('postgres_changes', {event:'*', schema:'public', table:'friendships', filter:'requester=eq.' + me}, async ev => { await loadFriends(); if (ev.eventType === 'UPDATE') toast('Richiesta di amicizia accettata!'); socialChanged(); })
+      .subscribe();
+  } catch(e){}
+  clearInterval(presTimer); presTimer = setInterval(trackPresence, 3000);
+}
+function stopSocial(){
+  try { presCh && sbc.removeChannel(presCh); } catch(e){} try { userCh && sbc.removeChannel(userCh); } catch(e){}
+  presCh = userCh = null; ONLINE = {}; INV = []; FR.accepted = []; FR.incoming = []; FR.outgoing = []; clearInterval(presTimer); presRoom = undefined;
+}
+function trackPresence(){
+  if (!presCh || !ACC.profile) return;
+  const r = myRoom(); if (r === presRoom) return; presRoom = r;
+  if (r !== invitedRoom){ invitedHere.clear(); invitedRoom = r || ''; }
+  // "room" resta di Sintonia: qui la stanza va in tb_room, così Sintonia non prova a entrarci
+  try { presCh.track({username:ACC.profile.username, game:GAME, tb_room:r}); } catch(e){}
+  renderInviteFriends();
+}
+// qualcosa è cambiato (amici, inviti, chi è online): aggiorno solo ciò che è sullo schermo
+function socialChanged(){
+  renderInviteFriends();
+  if (MODE === 'host' || P.joined || P.peer) return;
+  if (ACC.screen === 'home') home();
+  else if (ACC.screen === 'friends') drawFriendLists();
+  else if (ACC.screen === 'profile') profileScreen();
+}
+
+// --- homepage: inviti ricevuti e amici online ---
+function homeSocialHTML(){
+  if (!ACC.profile) return '';
+  const invs = INV.slice(0, 3).map(i => { const f = PROF[i.from_id] || {username:'un amico', color:'#3ee6d0'}, g = GAMES[i.game || 'sintonia'];
+    return `<div class="invban">${avHTML(f)}<div class="ib"><b>${fname(f)} ti ha invitato</b><small>${i.game === GAME ? 'Stanza ' + esc(i.room_code) : esc(g.name) + ' · stanza ' + esc(i.room_code)} · ${ago(i.created_at)}</small></div><button class="btn small" data-soc="accept-invite" data-id="${esc(i.id)}">Entra</button></div>`; }).join('');
+  const on = FR.accepted.filter(f => ONLINE[f.id]);
+  const strip = FR.accepted.length
+    ? `<div class="sechead"><h3>Amici online · ${on.length}</h3><button class="link" data-soc="friends">Vedi tutti</button></div>
+       <div class="fstrip">${on.map(f => { const st = fstate(f.id); return `<button class="fbub" data-soc="${st.here ? 'join-friend' : 'challenge'}" data-id="${f.id}" title="${esc(st.txt)}">${avHTML(f, 'lg')}<i class="${st.room ? 'busy' : ''}"></i><span>${fname(f)}</span><small>${st.here ? 'Raggiungi' : 'Sfida'}</small></button>`; }).join('') || '<p class="muted small" style="margin:4px 0">Nessun amico online adesso</p>'}</div>`
+    : `<button class="addfr" data-soc="friends">${ICO_PEOPLE}<span><b>Aggiungi i tuoi amici</b><small>Poi li inviti nella tua stanza con un tocco</small></span></button>`;
+  return `<div class="social">${invs}${strip}</div>`;
+}
+function wireSocial(root){
+  root.querySelectorAll('[data-soc]').forEach(b => b.onclick = () => socialAct(b.dataset.soc, b.dataset.id, b));
+}
+async function socialAct(a, id, el){
+  const me = ACC.profile && ACC.profile.id; if (!me) return;
+  switch (a){
+    case 'friends': return friendsScreen();
+    case 'profile': return profileScreen();
+    case 'accept-invite': return acceptInvite(id);
+    case 'join-friend': { const st = fstate(id); if (st.here) return goRoom(st.room); return toast('Non è più in una stanza'); }
+    case 'challenge': return challenge(id);
+    case 'invite': if (el) el.disabled = true; await sendInvite(id, myRoom()); return renderInviteFriends();
+    case 'add': {
+      if (el) el.disabled = true;
+      const {error} = await sbc.from('friendships').insert({requester:me, addressee:id});
+      if (error && error.code !== '23505'){ toast('Richiesta non inviata'); if (el) el.disabled = false; return; }
+      toast('Richiesta di amicizia inviata'); await loadFriends(); return socialChanged();
+    }
+    case 'accept': {
+      if (el) el.disabled = true;
+      const {error} = await sbc.from('friendships').update({status:'accepted'}).eq('requester', id).eq('addressee', me);
+      toast(error ? 'Non sono riuscito ad accettare' : 'Ora siete amici!'); await loadFriends(); return socialChanged();
+    }
+    case 'decline': case 'cancelreq': case 'unfriend': {
+      if (a === 'unfriend' && !confirm('Rimuovere questo amico?')) return;
+      await sbc.from('friendships').delete().or(`and(requester.eq.${id},addressee.eq.${me}),and(requester.eq.${me},addressee.eq.${id})`);
+      await loadFriends(); return socialChanged();
+    }
+    case 'rename': if (ACC.profile.badge){ toast('Gli account verificati non possono cambiare nome utente'); return; } return usernameScreen(true);
+    case 'logout': if (confirm("Uscire dall'account?")){ try { await sbc.auth.signOut(); } catch(e){} } return;
+    case 'home': return home();
+  }
+}
+// entro nella stanza di un amico con il mio account
+function goRoom(code, game){
+  game = game || GAME;
+  if (game !== GAME){ const g = GAMES[game]; location.href = g.url + '?' + g.q + '=' + encodeURIComponent(code); return; }
+  joinScreen(); const c = $('#jcode'); if (c) c.value = code; const b = $('#jgo'); if (b) b.click();
+}
+function acceptInvite(id){
+  const inv = INV.find(x => x.id === id); if (!inv) return;
+  sbc.from('invites').delete().eq('id', id).then(() => {}, () => {});
+  INV = INV.filter(x => x.id !== id);
+  if (myRoom() && inv.game === GAME){ toast('Sei già in una partita'); return; }
+  goRoom(inv.room_code, inv.game || 'sintonia');
+}
+// "Sfida": creo la stanza e invito subito l'amico
+function challenge(id){
+  hostStart(ACC.profile.username);
+  const t0 = Date.now(), iv = setInterval(() => {
+    if (MODE === 'host' && H.code && H.phase === 'lobby'){ clearInterval(iv); sendInvite(id, H.code).then(renderInviteFriends); }
+    else if (Date.now() - t0 > 20000) clearInterval(iv);
+  }, 300);
+}
+async function sendInvite(toId, room){
+  if (!ACC.profile || !room) return;
+  const {error} = await sbc.from('invites').insert({from_id:ACC.profile.id, to_id:toId, room_code:room, game:GAME});
+  if (error && error.code !== '23505'){ toast('Invito non inviato'); return; }
+  if (invitedRoom !== room){ invitedHere.clear(); invitedRoom = room; }
+  invitedHere.add(toId); const f = PROF[toId]; toast(`Invito inviato${f ? ' a ' + f.username : ''}`);
+}
+// riquadro "Invita dagli amici" nella lobby (host e giocatori)
+function renderInviteFriends(){
+  const box = document.querySelector('[data-invfr]'); if (!box) return;
+  if (!sbc){ box.innerHTML = ''; return; }
+  if (!ACC.profile){ box.innerHTML = `<p class="muted small invhint">Con un account puoi invitare gli amici direttamente da qui.</p>`; return; }
+  if (!FR.accepted.length){ box.innerHTML = `<h3>Invita dagli amici</h3><p class="muted small invhint">Aggiungi amici dalla homepage (Amici) per invitarli qui con un tocco.</p>`; return; }
+  const room = myRoom(); if (!room){ box.innerHTML = ''; return; }
+  const inRoom = new Set((MODE === 'host' ? H.players.map(p => p.uid) : (P.lobbyUids || [])).filter(Boolean));
+  const list = [...FR.accepted].sort((a, b) => (!!ONLINE[b.id] - !!ONLINE[a.id]) || a.username.localeCompare(b.username));
+  box.innerHTML = `<h3>Invita dagli amici</h3><div class="flist">${list.map(f => { const st = fstate(f.id);
+    const right = inRoom.has(f.id) ? '<span class="ftag ok">✓ Entrato</span>' : invitedHere.has(f.id) ? '<span class="ftag gold">Invito inviato</span>'
+      : `<button class="btn small ${st.on ? '' : 'ghost2'}" data-soc="invite" data-id="${f.id}">Invita</button>`;
+    const sub = inRoom.has(f.id) ? 'Nella stanza' : st.on ? (st.room === room ? 'Nella stanza' : st.txt) : 'Offline · riceverà l’invito';
+    return `<div class="frow ${st.on ? '' : 'dim'}">${avHTML(f)}${st.on ? '<i class="ondot"></i>' : ''}<div class="fi"><b>${fname(f)}</b><small>${esc(sub)}</small></div>${right}</div>`; }).join('')}</div>`;
+  wireSocial(box);
+}
+
+// --- schermata Amici ---
+function friendsScreen(){
+  if (!ACC.profile) return openLogin();
+  MODE = null; ACC.screen = 'friends'; document.body.dataset.mode = '';
+  app.innerHTML = `<div class="screen phone">
+    <div class="topline"><button class="link" data-soc="home">← Homepage</button><b class="ttl">Amici</b><span></span></div>
+    <label class="fsearch">${'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>'}<input id="fsearch" placeholder="Cerca per nome utente" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Cerca amici per nome utente"></label>
+    <div id="fresults"></div>
+    <div id="flists"></div>
+  </div>`;
+  wireSocial(app);
+  let t = null; $('#fsearch').oninput = () => { clearTimeout(t); t = setTimeout(searchFriends, 300); };
+  drawFriendLists();
+}
+function drawFriendLists(){
+  const box = $('#flists'); if (!box) return;
+  const row = (f, right, sub, cls = '') => { const st = fstate(f.id); return `<div class="frow ${cls}">${avHTML(f)}${st.on ? `<i class="ondot ${st.room ? 'busy' : ''}"></i>` : ''}<div class="fi"><b>${fname(f)}</b><small>${sub}</small></div>${right}</div>`; };
+  const on = FR.accepted.filter(f => ONLINE[f.id]), off = FR.accepted.filter(f => !ONLINE[f.id]);
+  box.innerHTML = `
+    ${FR.incoming.length ? `<h3 class="pinkh">Richieste · ${FR.incoming.length}</h3><div class="flist">${FR.incoming.map(f => row(f, `<button class="xbtn" data-soc="decline" data-id="${f.id}" aria-label="Rifiuta">✕</button><button class="btn small" data-soc="accept" data-id="${f.id}">Accetta</button>`, 'Vuole essere tuo amico', 'req')).join('')}</div>` : ''}
+    <h3>Online · ${on.length}</h3>
+    <div class="flist">${on.length ? on.map(f => { const st = fstate(f.id); return row(f, st.here ? `<button class="btn small alt" data-soc="join-friend" data-id="${f.id}">Raggiungi</button>` : `<button class="btn small" data-soc="challenge" data-id="${f.id}">Sfida</button>`, esc(st.txt)); }).join('') : '<p class="fempty">Nessun amico online in questo momento</p>'}</div>
+    <h3>Offline · ${off.length}</h3>
+    <div class="flist">${off.length ? off.map(f => row(f, `<button class="xbtn" data-soc="unfriend" data-id="${f.id}" aria-label="Rimuovi ${esc(f.username)}">✕</button>`, 'Offline', 'dim')).join('') : `<p class="fempty">${FR.accepted.length ? 'Tutti i tuoi amici sono online' : 'Cerca il nome utente di un amico qui sopra per aggiungerlo'}</p>`}</div>
+    ${FR.outgoing.length ? `<h3>Richieste inviate · ${FR.outgoing.length}</h3><div class="flist">${FR.outgoing.map(f => row(f, `<button class="link small" data-soc="cancelreq" data-id="${f.id}">Annulla</button>`, 'In attesa', 'dim')).join('')}</div>` : ''}`;
+  wireSocial(box);
+  if ($('#fsearch') && $('#fsearch').value) searchFriends();
+}
+async function searchFriends(){
+  const box = $('#fresults'), s = $('#fsearch'); if (!box || !s) return;
+  const q = cleanUser(s.value); if (q.length < 2){ box.innerHTML = ''; return; }
+  const {data} = await sbc.from('profiles').select('id,username,color').ilike('username', q.replace(/[_%]/g, m => '\\' + m) + '%').neq('id', ACC.profile.id).order('username').limit(8);
+  if (cleanUser(s.value) !== q) return;
+  (data || []).forEach(p => PROF[p.id] = p);
+  const st = p => FR.accepted.some(f => f.id === p.id) ? '<span class="ftag ok">Amici</span>' : FR.outgoing.some(f => f.id === p.id) ? '<span class="ftag">Richiesta inviata</span>'
+    : FR.incoming.some(f => f.id === p.id) ? `<button class="btn small" data-soc="accept" data-id="${p.id}">Accetta</button>` : `<button class="btn small" data-soc="add" data-id="${p.id}">Aggiungi</button>`;
+  box.innerHTML = data && data.length ? `<div class="flist" style="margin-top:10px">${data.map(p => `<div class="frow">${avHTML(p)}<div class="fi"><b>${fname(p)}</b><small>${ONLINE[p.id] ? 'Online' : 'Giocatore'}</small></div>${st(p)}</div>`).join('')}</div>`
+    : `<p class="fempty">Nessun giocatore trovato con “${esc(q)}”</p>`;
+  wireSocial(box);
+}
+
+// --- schermata Profilo ---
+function profileScreen(){
+  if (!ACC.profile) return home();
+  MODE = null; ACC.screen = 'profile'; document.body.dataset.mode = '';
+  const p = ACC.profile, ver = !!(p.badge || ACC.devIds.has(p.id)), on = FR.accepted.filter(f => ONLINE[f.id]).length;
+  const since = p.created_at ? new Date(p.created_at).toLocaleDateString('it-IT', {month:'long', year:'numeric'}) : '';
+  app.innerHTML = `<div class="screen phone">
+    <div class="topline"><button class="link" data-soc="home">← Homepage</button><b class="ttl">Profilo</b><span></span></div>
+    <div class="card phead">${avHTML(p, 'xl')}<div class="pinfo"><b>${fname(p)}</b><small>${ver ? 'Account verificato' : 'Account Yeezik Games'}${since ? ' · da ' + esc(since) : ''}</small></div></div>
+    <div class="sgrid">
+      <button class="scard" data-soc="friends"><small>Amici</small><b>${FR.accepted.length}</b></button>
+      <button class="scard" data-soc="friends"><small>Online ora</small><b class="c">${on}</b></button>
+      <button class="scard" data-soc="friends"><small>Richieste</small><b class="p">${FR.incoming.length}</b></button>
+    </div>
+    <p class="muted small" style="text-align:center;margin:0">Il tuo account e i tuoi amici valgono anche su Sintonia e sugli altri giochi Yeezik.</p>
+    ${ver ? `<p class="muted small" style="text-align:center;margin:0">${VBADGE} Account verificato: il nome utente non si può cambiare</p><button class="btn big ghost" data-soc="logout">Esci</button>`
+      : `<div class="grid2"><button class="btn alt" data-soc="rename">Cambia nome</button><button class="btn ghost" data-soc="logout">Esci</button></div>`}
+  </div>`;
+  wireSocial(app);
+}
+
 async function loadBadges(){
   try { const {data} = await sbc.rpc('player_badges'); ACC.devIds = new Set((data || []).filter(x => x.badge === 'dev').map(x => x.id)); refreshAccScreens(); } catch(e){}
 }
@@ -1681,6 +1995,7 @@ VIEW.lobby = () => {
         <div class="rrow"><input id="hrname" maxlength="16" autocomplete="off" value="${esc((byId(H.me.id) || {}).name || '')}"><button class="btn small alt" id="hrbtn">Cambia nome</button></div>
         <div id="hrmsg" class="rmsg"></div></div>` : ''}
       <div class="row" style="justify-content:flex-start"><button class="btn alt" id="invite">📤 Invita amici</button><span id="invmsg" class="muted small"></span></div>
+      <div class="invfr" data-invfr></div>
       <button class="btn big" id="startBtn">Inizia</button>
       <p class="muted small">Da 3 a 10 giocatori. Tieni aperta questa pagina: è lei che gestisce la partita.</p>
     </div>
@@ -1723,11 +2038,12 @@ VIEW.lobby = () => {
       $('#invmsg').textContent = 'Link copiato! Incollalo su WhatsApp.';
     } catch(e){ if (e && e.name !== 'AbortError') $('#invmsg').textContent = url; }
   };
-  UPD.lobby();
+  UPD.lobby(); trackPresence(); renderInviteFriends();
 };
 UPD.lobby = () => {
   if (!$('#pcount')) return VIEW.lobby();   // la lobby non è sullo schermo: la disegno da zero
   $('#pcount').textContent = `(${H.players.length}/10)`;
+  if (H.players.some(p => p.uid && invitedHere.has(p.uid))) setTimeout(renderInviteFriends, 0);
   $('#plist').innerHTML = H.players.length ? H.players.map(p => chip(p)).join('') : '<span class="muted">In attesa dei giocatori…</span>';
   $('#alist').textContent = H.audience.length ? `🍿 Pubblico (${H.audience.length}): ${H.audience.map(a => a.name).join(', ')}` : '';
   const others = [...H.players.filter(p => p.conn !== LOCAL), ...H.audience];
@@ -2096,7 +2412,8 @@ function playerBody(v, panel){
         </div>
         <div class="rmsg" data-rmsg></div>
       </div>
-      <div data-players>${lobbyPlayers(v)}</div></div>`;
+      <div data-players>${lobbyPlayers(v)}</div>
+      <div class="invfr" data-invfr></div></div>`;
   }
   if (v.type === 'show'){
     return `<div class="pbanner" style="font-size:22px">${v.mine ? '🥊 È la tua sfida!' : 'Ecco le risposte…'}</div>
@@ -2207,12 +2524,14 @@ function renderPlayer(v){
   if (Date.now() - (P.sessTs || 0) > 30000){ P.sessTs = Date.now(); saveSess(); }
   P.localEnd = v.left ? Date.now() + v.left : 0; P.total = v.total || 0;
   const key = viewKey(v);
+  if (v.type === 'lobby'){ const u = (v.players || []).map(x => x.uid).filter(Boolean).join(); if (u !== (P.lobbyUids || []).join()){ P.lobbyUids = u ? u.split(',') : []; setTimeout(renderInviteFriends, 0); } }
   if (key === P.lastKey){ updStatus(app, v); return; }
   P.lastKey = key;
   const top = `<div class="ptop"><span class="dot" style="background:${v.color}"></span><b>${esc(v.name)}${badge(v.uid)}</b><span class="pscore">${v.aud ? '🍿 Pubblico' : v.score + ' pt'}</span></div>`;
   app.innerHTML = `<div class="screen phone">${top}${playerBody(v, false)}</div>`;
   setMode(v); soundFor(v);
   wirePlayer(app, v, d => send(P.conn, d));
+  if (v.type === 'lobby'){ trackPresence(); renderInviteFriends(); }
 }
 
 /* ===================== PRESENTATORE ===================== */
