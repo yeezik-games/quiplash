@@ -193,7 +193,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--pink);outline:none}
 body:has(.nextbar) .vfoot{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 @keyframes slideup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 #app .screen{min-height:calc(100vh - 44px);min-height:calc(100dvh - 44px)}
-.vfoot{display:flex;justify-content:center;padding:8px 16px 14px}
+.vfoot{display:flex;justify-content:center;flex-wrap:wrap;gap:2px 6px;padding:8px 16px 14px}
 .vbtn{background:none;border:0;color:var(--muted);font:600 13px Rubik,sans-serif;cursor:pointer;padding:6px 10px;border-radius:99px}
 .vbtn:hover,.vbtn:focus-visible{background:rgba(255,255,255,.08);color:#fff;outline:none}
 .notes{position:fixed;inset:0;z-index:100;background:rgba(10,5,30,.7);display:flex;align-items:center;justify-content:center;padding:16px;animation:fadein .2s both}
@@ -271,6 +271,12 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
 .tbarv div{height:100%;background:linear-gradient(90deg,var(--pink),var(--yellow));border-radius:99px;transition:width .4s}
 .tcount{font-family:Bungee,sans-serif;font-size:18px;margin-top:6px}
 .home{max-width:480px;gap:22px}
+.manage{display:flex;flex-direction:column;gap:8px;width:100%;max-width:520px}
+.manage h3{margin:6px 0 2px}
+.mrow{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:14px;padding:8px 10px;flex-wrap:wrap}
+.mname{flex:1;min-width:90px;font-weight:700;overflow-wrap:anywhere}
+.mrow .btn.small{padding:8px 12px;font-size:14px;min-height:40px}
+.btn.ghost.danger{color:#ffb4b4;border-color:rgba(255,120,120,.45)}
 .backhome{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:8px 14px 8px 10px;border-radius:999px;border:2px solid rgba(255,255,255,.22);
   background:transparent;color:#e9e3ff;font:700 15px Rubik,sans-serif;cursor:pointer}
 .backhome:hover,.backhome:focus-visible{background:rgba(255,255,255,.1);color:#fff;outline:none}
@@ -322,8 +328,22 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
   .sign .bulb{animation:bulb 1s linear var(--d,0s) infinite!important}
   .sign{animation:signglow 2.4s ease-in-out infinite alternate!important}
   .signlogo span{animation:flicker 5s linear infinite!important}}
+/* stanza dell'host sul telefono: tutto centrato (su PC restano le due colonne) */
+@media (max-width:900px){
+  .lobby{max-width:520px;margin:0 auto}
+  .lobbyL{align-items:center;text-align:center}
+  .lobbyL > .backhome{align-self:flex-start}
+  .lobbyL .signwrap.compact{margin:6px auto 0}
+  .joinbox{flex-direction:column;justify-content:center;text-align:center;width:100%;box-sizing:border-box;gap:12px;padding:18px 16px}
+  .joinbox .url{max-width:100%;margin:6px auto 0}
+  #plist{justify-content:center!important}
+  #alist{text-align:center}
+  .lobbyL .row{justify-content:center!important}
+  .lobbyL .rename.host,.lobbyL .manage{width:100%;box-sizing:border-box;text-align:left}
+  .manage h3{text-align:center}
+  .lobbyR{text-align:left}
+}
 </style>
-  <script src="https://yeezikdev.github.io/yeezik-gameshub/hub-link.js" defer></script>
 </head>
 <body>
 <div id="app"></div>
@@ -627,10 +647,18 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.17';
+const VERSION = '1.20';
 // Un blocco per giorno (il più recente in cima). Aggiornamento nello stesso giorno: aggiungi la riga in cima al blocco e alza "to".
 const PATCH_NOTES = [
-  {date:'1 novembre 2026', from:'1.17', to:'1.17', items:[
+  {date:'2 novembre 2026', from:'1.20', to:'1.20', items:[
+    'Nuova icona del gioco nella scheda del browser e sulla schermata Home'
+  ]},
+  {date:'1 novembre 2026', from:'1.17', to:'1.19', items:[
+    'Il presentatore legge ad alta voce frasi, risposte e vincitori (di base sul dispositivo dell\'host)',
+    'Pubblico: chi arriva a partita iniziata o a stanza piena guarda e vota',
+    'L\'host può far uscire un giocatore o passare il ruolo di host a un altro',
+    'Suoni e vibrazione, che si spengono in fondo alla pagina',
+    'Stanza dell\'host più ordinata sul telefono: logo, QR e codice al centro',
     'Tutte le novità diventano ufficiali'
   ]},
   {date:'31 ottobre 2026', from:'1.8', to:'1.16', items:[
@@ -673,7 +701,17 @@ function openNotes(){
   f.className = 'vfoot';
   f.innerHTML = `<button class="vbtn" title="Novità di questa versione">Tappabuchi v${VERSION}${typeof IS_TEST !== 'undefined' && IS_TEST ? ' · prova' : ''} · <u>patch notes</u></button>`;
   f.querySelector('button').onclick = openNotes;
+  const sb = document.createElement('button');
+  sb.className = 'vbtn sndbtn';
+  const paint = () => { sb.textContent = SND.on ? '🔊 Suoni attivi' : '🔇 Suoni spenti'; sb.setAttribute('aria-pressed', SND.on ? 'true' : 'false'); };
+  sb.onclick = () => { SND.on = !SND.on; store('tb_sound', SND.on ? 'on' : 'off'); paint(); if (SND.on) SFX.pop(); };
+  f.appendChild(sb);
+  const vb = document.createElement('button');   // nascosto se il dispositivo non ha la sintesi vocale (vedi paintVoice)
+  vb.className = 'vbtn voicebtn'; vb.hidden = true;
+  vb.onclick = () => setVoice(!voiceOn());
+  f.appendChild(vb);
   document.body.appendChild(f);
+  setTimeout(() => { paint(); paintVoice(); }, 0);
 })();
 
 const COLORS = ['#ffd23f','#ff4fa3','#3ee6d0','#a99bff','#ff8a3d','#7ee36b','#4fb3ff','#ff6b6b','#f6a5ff','#c2f04d'];
@@ -710,6 +748,19 @@ function showError(msg){
 let MODE = null;
 
 /* ===================== HOME ===================== */
+// accende/spegne il presentatore su questo dispositivo
+function paintVoice(){
+  const on = voiceOn();
+  document.querySelectorAll('.voicebtn').forEach(b => { b.hidden = !VOICE.ok; b.textContent = on ? '🎙️ Presentatore attivo' : '🎙️ Presentatore spento'; b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+  const c = document.getElementById('voiceChk'); if (c) c.checked = on;
+}
+function setVoice(on){
+  store('tb_voice', on ? 'on' : 'off'); paintVoice();
+  if (on){ VOICE.unlocked = true; say(['Ciao! Sono il presentatore di Tappabuchi.']); } else hush();
+}
+// il valore di base dipende dal ruolo (host sì, giocatori no): aggiorno il pulsante quando cambia schermata
+new MutationObserver(() => requestAnimationFrame(paintVoice)).observe(document.getElementById('app'), {childList:true});
+
 // insegna animata del gioco: la stessa in homepage e nelle altre schermate
 function signHTML(compact){
   return `<div class="signwrap${compact ? ' compact' : ''}">
@@ -756,6 +807,7 @@ addEventListener('resize', () => requestAnimationFrame(placeAllBulbs));
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeAllBulbs);
 
 function home(){
+  hush();
   document.body.dataset.mode = '';
   MODE = null; window.onbeforeunload = null;
   app.innerHTML = `<div class="screen center home">
@@ -775,7 +827,6 @@ function home(){
         <div class="hnote n4"><b>4</b><p>Tre round e classifica: vince chi fa ridere.</p></div>
       </div>
     </section>
-    <yeezik-hub-link></yeezik-hub-link>
   </div>`;
   $('#bHost').onclick = hostSetup;
   $('#bJoin').onclick = () => joinScreen();
@@ -786,8 +837,11 @@ function loadUsed(){ try { const a = JSON.parse(load('tb_used') || '[]'); return
 const H = {
   peer:null, code:'', players:[], seq:0, phase:'lobby', round:0, matchups:[], cur:-1,
   timerEnd:0, timerTotal:0, tok:0, to:null, used:new Set(loadUsed()),
-  settings:{answerTime:90, voteTime:10}, custom:[], customRaw:'', onlyCustom:false
+  settings:{answerTime:90, voteTime:10}, custom:[], customRaw:'', onlyCustom:false,
+  audience:[], banned:new Set()
 };
+const AUD_COLOR = '#a99bff';
+const MAX_AUD = 50;
 
 function genCode(){ const L = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; let c = ''; for (let i = 0; i < 4; i++) c += L[Math.floor(Math.random()*L.length)]; return c; }
 
@@ -845,7 +899,7 @@ function drawHP(){
   el.dataset.key = key;
   el.innerHTML = `<div class="ptop"><span class="dot" style="background:${v.color}"></span><b>👑 ${esc(v.name)}</b><span class="pill" style="margin-left:6px">Stanza ${H.code}</span><span class="pscore">${v.score} pt</span></div>`
                + playerBody(Object.assign({}, v, {next:''}), false);
-  setMode(v);
+  setMode(v); soundFor(v);
   wirePlayer(el, v, d => hostMsg(LOCAL, d));
 }
 // Pulsanti dell'host per far avanzare la partita (le fasi vanno avanti anche da sole)
@@ -871,12 +925,12 @@ function drawBar(){
   if (b) $('#hb').onclick = b[1];
 }
 
-function hostStart(myName){
+function hostStart(myName, fixedCode, tries){
   clearSess();
   if (typeof Peer === 'undefined') return showError('Impossibile caricare la libreria di rete. Controlla la connessione.');
   MODE = 'host';
-  app.innerHTML = spinner('Creo la stanza…');
-  const code = genCode();
+  app.innerHTML = spinner(fixedCode ? `Diventi l'host della stanza ${fixedCode}…` : 'Creo la stanza…');
+  const code = fixedCode || genCode();
   const peer = new Peer(PREFIX + code);
   let opened = false;
   peer.on('open', () => {
@@ -889,7 +943,12 @@ function hostStart(myName){
   peer.on('connection', onConn);
   peer.on('disconnected', () => { try { peer.reconnect(); } catch(e){} });
   peer.on('error', e => {
-    if (e.type === 'unavailable-id' && !opened){ peer.destroy(); hostStart(myName); }
+    if (e.type === 'unavailable-id' && !opened){
+      peer.destroy();
+      // passaggio di host: il codice si libera appena il vecchio host esce, riprovo per qualche secondo
+      if (fixedCode && (tries || 0) < 15) return setTimeout(() => hostStart(myName, fixedCode, (tries || 0) + 1), 1000);
+      hostStart(myName);
+    }
     else if (!opened) showError('Errore di rete (' + e.type + '). Riprova.');
     else console.warn(e);
   });
@@ -900,7 +959,7 @@ document.addEventListener('visibilitychange', () => { if (MODE === 'host' && doc
 
 function onConn(conn){
   conn.on('data', d => { try { hostMsg(conn, d); } catch(e){ console.error(e); } });
-  const lost = () => { const p = H.players.find(x => x.conn === conn); if (p) markLost(p, false); };
+  const lost = () => { const p = H.players.find(x => x.conn === conn) || H.audience.find(x => x.conn === conn); if (p) markLost(p, false); };
   conn.on('close', lost); conn.on('error', lost);
 }
 // un giocatore è sparito (connessione chiusa o nessun segnale da troppo tempo)
@@ -908,7 +967,8 @@ function markLost(p, closeIt){
   if (!p.connected || p.conn === LOCAL) return;
   p.connected = false;
   if (closeIt) try { p.conn.close(); } catch(e){}
-  if (H.phase === 'lobby') H.players.splice(H.players.indexOf(p), 1);
+  if (p.aud){ if (H.phase === 'lobby') H.audience.splice(H.audience.indexOf(p), 1); }
+  else if (H.phase === 'lobby') H.players.splice(H.players.indexOf(p), 1);
   broadcast(); renderHost(); checkProgress();
 }
 // controllo di presenza: chi non manda segnali da 15 secondi viene segnato come disconnesso
@@ -916,7 +976,7 @@ const HOST_TIMEOUT = 15000;
 setInterval(() => {
   if (MODE !== 'host') return;
   const now = Date.now();
-  H.players.slice().forEach(p => { if (p.conn !== LOCAL && p.connected && p.hb && p.seen && now - p.seen > HOST_TIMEOUT) markLost(p, true); });
+  [...H.players, ...H.audience].forEach(p => { if (p.conn !== LOCAL && p.connected && p.hb && p.seen && now - p.seen > HOST_TIMEOUT) markLost(p, true); });
 }, 3000);
 
 const byId = id => H.players.find(p => p.id === id);
@@ -933,6 +993,7 @@ function hostMsg(conn, d){
     const name = String(d.name || '').trim().replace(/\s+/g,' ').slice(0, 16);
     if (!name) return send(conn, {t:'err', msg:'Inserisci un nome.'});
     const tok = String(d.tok || '').slice(0, 64);
+    if (tok && H.banned.has(tok)) return send(conn, {t:'err', msg:"L'host ti ha fatto uscire da questa stanza."});
     // prima cerco il dispositivo (chiave segreta), poi il nome
     let p = (tok && H.players.find(x => x.tok === tok)) || H.players.find(x => x.name.toLowerCase() === name.toLowerCase());
     if (p){
@@ -943,18 +1004,31 @@ function hostMsg(conn, d){
       if (p.conn && p.conn !== conn && p.conn !== LOCAL) try { p.conn.close(); } catch(e){}
       p.conn = conn; p.connected = true; if (tok) p.tok = tok;
     } else {
-      if (H.phase !== 'lobby') return send(conn, {t:'err', msg:'La partita è già iniziata. Aspetta la prossima!'});
-      if (H.players.length >= 10) return send(conn, {t:'err', msg:'Stanza piena (massimo 10 giocatori).'});
+      // già nel pubblico (stesso telefono o stesso nome)?
+      let a = (tok && H.audience.find(x => x.tok === tok)) || H.audience.find(x => x.name.toLowerCase() === name.toLowerCase());
+      if (a){
+        const sameDevice = tok && a.tok === tok;
+        if (!sameDevice && a.connected && a.conn !== conn && a.conn && a.conn.open) return send(conn, {t:'err', msg:'Nome già in uso. Scegline un altro.'});
+        if (a.conn && a.conn !== conn) try { a.conn.close(); } catch(e){}
+        a.conn = conn; a.connected = true; if (tok) a.tok = tok;
+      }
+      // partita già iniziata o stanza piena: si entra come pubblico
+      else if (H.phase !== 'lobby' || H.players.length >= 10){
+        if (H.audience.length >= MAX_AUD) return send(conn, {t:'err', msg:'Stanza piena, anche il pubblico. Aspetta la prossima partita!'});
+        a = {id:'a' + (++H.seq), name, conn, connected:true, tok, aud:true, score:0, color:AUD_COLOR};
+        H.audience.push(a);
+      }
+      if (a){ a.seen = Date.now(); send(conn, {t:'joined', name:a.name}); broadcast(); renderHost(); return; }
       const used = H.players.map(x => x.color);
       p = {id:'p' + (++H.seq), name, score:0, conn, connected:true, tok, color: COLORS.find(c => !used.includes(c)) || COLORS[0]};
       H.players.push(p);
     }
-    p.seen = Date.now();
+    p.seen = Date.now(); p.ver = String(d.ver || '');
     send(conn, {t:'joined', name:p.name});
     broadcast(); renderHost(); return;
   }
   const p = H.players.find(x => x.conn === conn);
-  if (!p) return;
+  if (!p){ const a = H.audience.find(x => x.conn === conn); if (a) audMsg(a, conn, d); return; }
   p.seen = Date.now();
   if (d.t === 'ping'){ p.hb = true; return send(conn, {t:'pong'}); }
 
@@ -990,14 +1064,28 @@ function hostMsg(conn, d){
   }
 }
 
+// messaggi dal pubblico: solo il voto (tutto il pubblico insieme vale un voto)
+function audMsg(a, conn, d){
+  a.seen = Date.now();
+  if (d.t === 'ping'){ a.hb = true; return send(conn, {t:'pong'}); }
+  if (d.t === 'rename') return send(conn, {t:'renameErr', msg:'Nel pubblico non puoi cambiare nome.'});
+  if (d.t === 'vote' && H.phase === 'vote'){
+    const m = cur(); if (!m) return;
+    m.aud = m.aud || {};
+    if (m.aud[a.id] || !m.answers[d.choice]) return;
+    m.aud[a.id] = d.choice;
+    if (!m.final) m.players.forEach(id => { const x = byId(id); if (x) sendView(x); });
+    sendAudView(a); renderHost(); checkProgress();
+  }
+}
 function checkProgress(){
   if (H.phase === 'answer'){
     const c = H.players.filter(p => p.connected);
     if (c.length && c.every(p => H.matchups.every(m => !m.players.includes(p.id) || m.answers[p.id]))) endAnswer();
   } else if (H.phase === 'vote'){
     const m = cur();
-    const c = elig(m).filter(p => p.connected);
-    if (c.length && c.every(p => m.votes[p.id])) endVote();
+    const c = elig(m).filter(p => p.connected), ac = H.audience.filter(a => a.connected);
+    if ((c.length || ac.length) && c.every(p => m.votes[p.id]) && ac.every(a => (m.aud || {})[a.id])) endVote();
   }
 }
 
@@ -1074,7 +1162,12 @@ function nextMatch(){
   // 1) le risposte compaiono una alla volta
   H.phase = 'show';
   renderHost(); broadcast();
-  setTimer(1 + m.order.length * revealStep(m) + 1.2, startVote, false);
+  let showSec = 1 + m.order.length * revealStep(m) + 1.2;
+  if (voiceOn()){   // presentatore acceso: tempo per leggere frase e risposte (circa 2,6 parole al secondo)
+    const words = (m.prompt + ' ' + m.order.map(id => m.answers[id].join(' ')).join(' ')).split(/\s+/).length + m.order.length * 2;
+    showSec = Math.min(35, Math.max(showSec, 1.5 + words / 2.6));
+  }
+  setTimer(showSec, startVote, false);
 }
 const revealStep = m => m.final ? 1.4 : 1.8;
 // 2) votazione
@@ -1140,7 +1233,13 @@ function score(m){
   const R = {};
   m.players.forEach(id => R[id] = {votes:0, pts:0, voters:[]});
   Object.entries(m.votes).forEach(([v, c]) => { if (R[c]){ R[c].votes++; const vp = byId(v); R[c].voters.push(vp ? vp.name : '?'); } });
-  const total = Object.keys(m.votes).length;
+  let total = Object.keys(m.votes).length;
+  const av = Object.values(m.aud || {}).filter(c => R[c]);
+  if (av.length){
+    const cnt = {}; av.forEach(c => cnt[c] = (cnt[c] || 0) + 1);
+    const max = Math.max(...Object.values(cnt)), top = Object.keys(cnt).filter(k => cnt[k] === max);
+    if (top.length === 1){ R[top[0]].votes++; R[top[0]].voters.push(`Pubblico (${max} su ${av.length})`); total++; }
+  }
   if (m.final){
     Object.values(R).forEach(r => r.pts = r.votes * 500);
     if (m.forfeit) R[m.forfeit].pts = 1000;
@@ -1170,23 +1269,68 @@ function endGame(){ clearTimer(); H.phase = 'end'; renderHost(); broadcast(); }
 function nextRound(){ H.round++; startRound(); }
 // l'host torna alla homepage: chiude la stanza e avvisa chi era entrato
 function closeRoom(){
-  const others = H.players.filter(p => p.conn !== LOCAL && p.connected).length;
+  const others = [...H.players, ...H.audience].filter(p => p.conn !== LOCAL && p.connected).length;
   if (others){
     const who = others === 1 ? 'il giocatore entrato verrà fatto uscire' : `i ${others} giocatori entrati verranno fatti uscire`;
     if (!confirm(`Vuoi chiudere la stanza ${H.code} e tornare alla homepage? ${who.charAt(0).toUpperCase() + who.slice(1)}.`)) return;
   }
-  H.players.forEach(p => { if (p.conn !== LOCAL) send(p.conn, {t:'closed'}); });
+  [...H.players, ...H.audience].forEach(p => { if (p.conn !== LOCAL) send(p.conn, {t:'closed'}); });
   clearTimer();
   const old = H.peer;
   setTimeout(() => { try { if (old) old.destroy(); } catch(e){} }, 400);   // il tempo di far arrivare l'avviso
-  Object.assign(H, {peer:null, code:'', players:[], phase:'lobby', round:0, matchups:[], cur:-1, me:null});
+  Object.assign(H, {peer:null, code:'', players:[], audience:[], banned:new Set(), phase:'lobby', round:0, matchups:[], cur:-1, me:null});
   lastKey = '';   // la prossima stanza va ridisegnata da zero
   home();
+}
+// l'host fa uscire un giocatore (o uno del pubblico): non potrà rientrare in questa stanza
+function kick(id){
+  const p = H.players.find(x => x.id === id) || H.audience.find(x => x.id === id);
+  if (!p || p.conn === LOCAL || H.phase !== 'lobby') return;
+  if (!confirm(`Vuoi far uscire ${p.name} dalla stanza? Non potrà rientrare in questa stanza.`)) return;
+  if (p.tok) H.banned.add(p.tok);
+  send(p.conn, {t:'kicked'});
+  const c = p.conn; setTimeout(() => { try { c.close(); } catch(e){} }, 300);
+  H.players = H.players.filter(x => x !== p); H.audience = H.audience.filter(x => x !== p);
+  broadcast(); renderHost();
+}
+// l'host passa il ruolo a un altro giocatore: la stanza (stesso codice) si sposta sul suo telefono
+function makeHost(id){
+  const p = H.players.find(x => x.id === id);
+  if (!p || p.conn === LOCAL || !p.connected || !p.ver || H.phase !== 'lobby') return;
+  const meName = H.me ? (byId(H.me.id) || {}).name : '';
+  if (!confirm(`Vuoi passare il ruolo di host a ${p.name}? La stanza ${H.code} resta la stessa e tutti si ricollegano da soli.${meName ? ' Tu resterai nella stanza come giocatore.' : ''}`)) return;
+  readSettings();
+  send(p.conn, {t:'becomeHost', state:{code:H.code, settings:H.settings, customRaw:H.customRaw, onlyCustom:H.onlyCustom, banned:[...H.banned]}});
+  [...H.players, ...H.audience].forEach(x => { if (x !== p && x.conn !== LOCAL) send(x.conn, {t:'moving', host:p.name}); });
+  const code = H.code, old = H.peer;
+  clearTimer();
+  Object.assign(H, {peer:null, code:'', players:[], audience:[], banned:new Set(), phase:'lobby', round:0, matchups:[], cur:-1, me:null});
+  lastKey = ''; window.onbeforeunload = null;
+  setTimeout(() => { try { if (old) old.destroy(); } catch(e){} }, 500);   // libero il codice per il nuovo host
+  if (!meName) return home();
+  // il vecchio host rientra come giocatore
+  MODE = 'player'; P.code = code; P.name = meName; P.stop = false; P.tries = 0; P.resuming = false; P.moving = p.name;
+  reconnectScreen(false);
+  setTimeout(() => { P.tries = 0; autoReconnect(); }, 1500);
+}
+// questo telefono diventa l'host della stanza
+function takeOverHost(name, st){
+  H.settings = Object.assign({}, H.settings, st.settings || {});
+  H.customRaw = st.customRaw || ''; H.custom = parseCustom(H.customRaw); H.onlyCustom = !!st.onlyCustom && H.custom.length > 0;
+  H.players = []; H.audience = []; H.banned = new Set(st.banned || []);
+  hostStart(name, st.code, 0);
 }
 function playAgain(){
   clearTimer();
   H.players = H.players.filter(p => p.connected);
   H.players.forEach(p => p.score = 0);
+  const promote = H.audience.filter(a => a.connected).slice(0, Math.max(0, 10 - H.players.length));
+  promote.forEach(a => {
+    const used = H.players.map(x => x.color);
+    H.players.push({id:'p' + (++H.seq), name:a.name, score:0, conn:a.conn, connected:true, tok:a.tok, seen:a.seen, hb:a.hb,
+      color: COLORS.find(c => !used.includes(c)) || COLORS[0]});
+  });
+  H.audience = H.audience.filter(a => a.connected && !promote.includes(a));
   H.round = 0; H.matchups = []; H.cur = -1; H.phase = 'lobby';
   renderHost(true); broadcast();
 }
@@ -1197,7 +1341,7 @@ function viewFor(p){
              left: H.timerEnd ? Math.max(0, H.timerEnd - Date.now()) : 0, total: H.timerTotal};
   const W = (emoji, title, msg) => Object.assign(v, {type:'wait', emoji, title, msg});
   switch (H.phase){
-    case 'lobby': return Object.assign(v, {type:'lobby', code:H.code, players:H.players.map(x => ({name:x.name, color:x.color, host:!!x.host, me:x.id === p.id}))});
+    case 'lobby': return Object.assign(v, {type:'lobby', code:H.code, players:H.players.map(x => ({name:x.name, color:x.color, host:!!x.host, me:x.id === p.id})), audience:H.audience.map(a => a.name)});
     case 'intro': return W('🔥', H.round < 3 ? 'Round ' + H.round : 'Round finale', introText());
     case 'answer': {
       const mine = H.matchups.map((m, i) => ({m, i})).filter(x => x.m.players.includes(p.id));
@@ -1212,8 +1356,10 @@ function viewFor(p){
     case 'vote': {
       const m = cur();
       if (!canVote(p, m)){
-        const opts = (m.order || answered(m)).map(id => ({parts: m.answers[id], votes: Object.values(m.votes).filter(c => c === id).length, mine: id === p.id}));
-        return Object.assign(v, {type:'tally', prompt:m.prompt, options:opts, voted:Object.keys(m.votes).length, voters:elig(m).filter(x => x.connected).length});
+        const aud = Object.values(m.aud || {});
+        const opts = (m.order || answered(m)).map(id => ({parts: m.answers[id], votes: Object.values(m.votes).filter(c => c === id).length, aud: aud.filter(c => c === id).length, mine: id === p.id}));
+        return Object.assign(v, {type:'tally', prompt:m.prompt, options:opts, voted:Object.keys(m.votes).length + aud.length,
+          voters:elig(m).filter(x => x.connected).length + H.audience.filter(a => a.connected).length});
       }
       if (m.votes[p.id]) return Object.assign(W('✅', 'Voto registrato!', 'Aspetta gli altri: tra poco scopriamo chi vince.'), {mode:'vote'});
       const opts = (m.order || answered(m)).filter(id => id !== p.id).map(id => ({id, parts: m.answers[id]}));
@@ -1253,7 +1399,19 @@ function viewFor(p){
   }
 }
 function sendView(p){ if (p.connected) send(p.conn, {t:'view', v:viewFor(p)}); }
-function broadcast(){ H.players.forEach(sendView); }
+// il pubblico vede le stesse schermate, ma non scrive e ha un solo voto collettivo
+function viewForAud(a){
+  const v = viewFor({id:a.id, name:a.name, score:0, color:AUD_COLOR});
+  v.aud = true;
+  const W = (emoji, title, msg) => Object.assign(v, {type:'wait', emoji, title, msg});
+  if (H.phase === 'lobby') return W('🍿', 'Sei nel pubblico', 'La stanza è piena: guarderai le sfide e voterai. Alla prossima partita, se si libera un posto, giochi anche tu.');
+  if (H.phase === 'answer') return W('🍿', 'Sei nel pubblico', 'I giocatori stanno scrivendo: tra poco voti anche tu.');
+  if (H.phase === 'vote' && (cur().aud || {})[a.id]) return Object.assign(W('✅', 'Voto registrato!', 'Il pubblico vota insieme: la risposta più votata da voi prende un voto in più.'), {mode:'vote'});
+  if (H.phase === 'end') v.sub = 'Grazie per aver fatto il tifo dal pubblico! Alla prossima partita giochi anche tu.';
+  return v;
+}
+function sendAudView(a){ if (a.connected) send(a.conn, {t:'view', v:viewForAud(a)}); }
+function broadcast(){ H.players.forEach(sendView); H.audience.forEach(sendAudView); }
 
 /* --- rendering dello schermo host --- */
 let lastKey = '';
@@ -1270,6 +1428,7 @@ function renderHost(force){
   }
   const key = H.phase + '|' + H.round + '|' + H.cur;
   if (!force && key === lastKey && UPD[H.phase]){ UPD[H.phase](); return; }
+  if (key !== lastKey) screenSound();
   lastKey = key;
   (VIEW[H.phase] || (() => {}))();
 }
@@ -1294,6 +1453,8 @@ VIEW.lobby = () => {
       </div>
       <h3>Giocatori <span id="pcount" class="muted"></span></h3>
       <div id="plist" class="chips" style="justify-content:flex-start"></div>
+      <div id="alist" class="muted small"></div>
+      <div id="manage" class="manage"></div>
       ${H.me ? `<div class="rename host">
         <label class="rlabel" for="hrname">Il tuo nome</label>
         <div class="rrow"><input id="hrname" maxlength="16" autocomplete="off" value="${esc((byId(H.me.id) || {}).name || '')}"><button class="btn small alt" id="hrbtn">Cambia nome</button></div>
@@ -1309,6 +1470,7 @@ VIEW.lobby = () => {
       <label>Frasi extra (facoltativo: le frasi le sceglie già il gioco). Una per riga, ___ per ogni buco
         <textarea id="custom" rows="6" placeholder="Il peggior regalo per ___ è ___">${esc(H.customRaw)}</textarea></label>
       <label class="check"><input type="checkbox" id="onlyCustom" ${H.onlyCustom ? 'checked' : ''}> Usa solo i miei prompt</label>
+      ${VOICE.ok ? `<label class="check"><input type="checkbox" id="voiceChk" ${voiceOn() ? 'checked' : ''}> 🎙️ Presentatore che legge ad alta voce (su questo dispositivo)</label>` : ''}
     </div>
   </div></div>`;
   const qr = $('#qr');
@@ -1317,6 +1479,11 @@ VIEW.lobby = () => {
   } else qr.remove();
   $('#startBtn').onclick = startGame;
   $('#toHome').onclick = closeRoom;
+  if ($('#voiceChk')) $('#voiceChk').onchange = e => setVoice(e.target.checked);
+  $('#manage').onclick = e => {
+    const b = e.target.closest('button[data-act]'); if (!b) return;
+    if (b.dataset.act === 'kick') kick(b.dataset.id); else makeHost(b.dataset.id);
+  };
   if (H.me){
     const doRename = () => {
       const n = $('#hrname').value.trim();
@@ -1340,6 +1507,12 @@ UPD.lobby = () => {
   if (!$('#pcount')) return VIEW.lobby();   // la lobby non è sullo schermo: la disegno da zero
   $('#pcount').textContent = `(${H.players.length}/10)`;
   $('#plist').innerHTML = H.players.length ? H.players.map(p => chip(p)).join('') : '<span class="muted">In attesa dei giocatori…</span>';
+  $('#alist').textContent = H.audience.length ? `🍿 Pubblico (${H.audience.length}): ${H.audience.map(a => a.name).join(', ')}` : '';
+  const others = [...H.players.filter(p => p.conn !== LOCAL), ...H.audience];
+  $('#manage').innerHTML = others.length ? `<h3>Gestisci la stanza</h3>${others.map(p => `<div class="mrow">
+      <span class="dot" style="background:${p.color}"></span><span class="mname">${esc(p.name)}${p.aud ? ' <span class="muted small">(pubblico)</span>' : ''}</span>
+      ${!p.aud && p.connected && p.ver ? `<button class="btn small ghost" data-act="host" data-id="${p.id}">Rendi host</button>` : ''}
+      <button class="btn small ghost danger" data-act="kick" data-id="${p.id}">Espelli</button></div>`).join('')}` : '';
   const b = $('#startBtn'), miss = 3 - H.players.length;
   b.disabled = miss > 0;
   b.textContent = miss > 0 ? (miss === 1 ? 'Serve ancora 1 giocatore' : `Servono ancora ${miss} giocatori`) : 'Inizia la partita!';
@@ -1440,7 +1613,7 @@ VIEW.vote = () => {
 };
 UPD.vote = () => {
   const m = cur();
-  $('#vstatus').textContent = `${Object.keys(m.votes).length}/${elig(m).filter(p => p.connected).length} hanno votato`;
+  $('#vstatus').textContent = `${Object.keys(m.votes).length + Object.keys(m.aud || {}).length}/${elig(m).filter(p => p.connected).length + H.audience.filter(a => a.connected).length} hanno votato`;
 };
 
 // 3) Vincitore della sfida
@@ -1565,7 +1738,7 @@ function connect(retry){
   peer.on('open', () => {
     if (P.peer !== peer) return;
     const conn = peer.connect(PREFIX + P.code, {reliable:true}); P.conn = conn;
-    conn.on('open', () => conn.send({t:'join', name:P.name, tok:myTok()}));
+    conn.on('open', () => conn.send({t:'join', name:P.name, tok:myTok(), ver:VERSION}));
     conn.on('data', d => { P.lastPong = Date.now(); playerMsg(d, to); });
     conn.on('close', () => { if (P.conn !== conn) return; if (P.joined) lostConn(); else fail('Connessione interrotta. Riprova.'); });
   });
@@ -1575,7 +1748,7 @@ function connect(retry){
     if (e.type === 'peer-unavailable'){
       // la stanza non esiste (più): in riconnessione riprovo una volta, poi mi arrendo
       clearTimeout(to); cleanupPlayer();
-      if (retry && P.tries < 2) return setTimeout(autoReconnect, 1500);
+      if (retry && (P.tries < 2 || P.moving)) return setTimeout(autoReconnect, 1500);   // durante il cambio di host il codice torna disponibile dopo poco
       clearSess(); P.stop = true;
       return joinScreen(retry ? "La partita non c'è più: l'host ha chiuso la stanza." : 'Stanza non trovata. Controlla il codice.');
     }
@@ -1597,8 +1770,9 @@ function autoReconnect(){
   connect(true);
 }
 function reconnectScreen(gaveUp){
-  const title = gaveUp ? 'Non riesco a riconnettermi' : P.resuming ? 'Rientro nella partita' : 'Connessione persa';
+  const title = gaveUp ? 'Non riesco a riconnettermi' : P.moving ? 'Cambio di host' : P.resuming ? 'Rientro nella partita' : 'Connessione persa';
   const msg = gaveUp ? 'Controlla la connessione internet e riprova: rientrerai con lo stesso nome e riprenderai da dove eri.'
+    : P.moving ? `<b>${esc(P.moving)}</b> diventa l'host: mi ricollego alla stanza <b>${esc(P.code)}</b>…`
     : `Mi sto ricollegando alla stanza <b>${esc(P.code)}</b> come <b>${esc(P.name)}</b>…`;
   app.innerHTML = `<div class="screen phone center"><div class="emoji">${gaveUp ? '😵' : '📡'}</div><h2>${title}</h2>
     <p class="lead">${msg}</p>
@@ -1638,8 +1812,11 @@ document.addEventListener('visibilitychange', () => {
 function playerMsg(d, to){
   if (!d || typeof d !== 'object') return;
   if (d.t === 'err'){ clearTimeout(to); cleanupPlayer(); clearSess(); P.stop = true; P.resuming = false; return joinScreen(d.msg); }
-  if (d.t === 'joined'){ clearTimeout(to); P.joined = true; P.name = d.name; P.tries = 0; P.resuming = false; store('tb_name', d.name); saveSess(); return; }
+  if (d.t === 'joined'){ clearTimeout(to); P.joined = true; P.name = d.name; P.tries = 0; P.resuming = false; P.moving = ''; store('tb_name', d.name); saveSess(); return; }
   if (d.t === 'pong'){ P.hbOK = true; return; }
+  if (d.t === 'kicked'){ clearTimeout(to); P.stop = true; P.resuming = false; cleanupPlayer(); clearSess(); return joinScreen("L'host ti ha fatto uscire dalla stanza."); }
+  if (d.t === 'moving'){ P.moving = d.host; return; }
+  if (d.t === 'becomeHost'){ clearTimeout(to); P.stop = true; P.moving = ''; const nm = P.name; cleanupPlayer(); clearSess(); return takeOverHost(nm, d.state); }
   if (d.t === 'closed'){ clearTimeout(to); P.stop = true; P.resuming = false; cleanupPlayer(); clearSess(); return joinScreen("L'host ha chiuso la stanza. Chiedigli il nuovo codice per rientrare."); }
   if (d.t === 'renamed'){ P.name = d.name; store('tb_name', d.name); saveSess(); return; }
   if (d.t === 'renameErr'){ const e = app.querySelector('[data-rmsg]'); if (e){ e.className = 'rmsg bad'; e.textContent = d.msg; } const b = app.querySelector('[data-rsave]'); if (b) b.disabled = false; return; }
@@ -1648,7 +1825,8 @@ function playerMsg(d, to){
 
 function lobbyPlayers(v){
   return `<div class="muted">Giocatori nella stanza ${esc(v.code)} (${v.players.length})</div>
-    <div class="chips">${v.players.map(x => `<span class="chip ${x.me ? 'mechip' : ''}" style="background:${x.color}">${x.host ? '👑 ' : ''}${esc(x.name)}${x.me ? ' (tu)' : ''}</span>`).join('')}</div>`;
+    <div class="chips">${v.players.map(x => `<span class="chip ${x.me ? 'mechip' : ''}" style="background:${x.color}">${x.host ? '👑 ' : ''}${esc(x.name)}${x.me ? ' (tu)' : ''}</span>`).join('')}</div>
+    ${v.audience && v.audience.length ? `<div class="muted small">🍿 Pubblico: ${v.audience.map(esc).join(', ')}</div>` : ''}`;
 }
 function statusInner(st){
   const writing = st.filter(x => !x.done), done = st.filter(x => x.done);
@@ -1737,8 +1915,8 @@ function playerBody(v, panel){
       <div class="opts">${v.options.map(o => `<div class="opt tally ${o.mine ? 'mine' : 'rival'}">
         <span class="tag ${o.mine ? '' : 'grey'}">${o.mine ? 'LA TUA' : 'AVVERSARIO'}</span>
         <div style="margin-top:8px">${fill(v.prompt, o.parts)}</div>
-        <div class="tbarv"><div style="width:${(o.votes / tot * 100).toFixed(0)}%"></div></div>
-        <div class="tcount">${o.votes} vot${o.votes === 1 ? 'o' : 'i'}</div></div>`).join('')}</div>
+        <div class="tbarv"><div style="width:${((o.votes + (o.aud || 0)) / tot * 100).toFixed(0)}%"></div></div>
+        <div class="tcount">${o.votes} vot${o.votes === 1 ? 'o' : 'i'}${o.aud ? ` · pubblico ${o.aud}` : ''}</div></div>`).join('')}</div>
       <div class="votedcount">${v.voted}/${v.voters} hanno votato</div>`;
   }
   if (v.type === 'vote'){
@@ -1808,10 +1986,136 @@ function renderPlayer(v){
   const key = viewKey(v);
   if (key === P.lastKey){ updStatus(app, v); return; }
   P.lastKey = key;
-  const top = `<div class="ptop"><span class="dot" style="background:${v.color}"></span><b>${esc(v.name)}</b><span class="pscore">${v.score} pt</span></div>`;
+  const top = `<div class="ptop"><span class="dot" style="background:${v.color}"></span><b>${esc(v.name)}</b><span class="pscore">${v.aud ? '🍿 Pubblico' : v.score + ' pt'}</span></div>`;
   app.innerHTML = `<div class="screen phone">${top}${playerBody(v, false)}</div>`;
-  setMode(v);
+  setMode(v); soundFor(v);
   wirePlayer(app, v, d => send(P.conn, d));
+}
+
+/* ===================== PRESENTATORE ===================== */
+// legge ad alta voce con la voce italiana del dispositivo. Di base parla solo il dispositivo dell'host
+// (in una stanza con tanti telefoni sarebbe un'eco); chi gioca da remoto lo accende in fondo alla pagina.
+const VOICE = {ok: typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined', v:null, unlocked:false};
+function voiceOn(){ if (!VOICE.ok) return false; const x = load('tb_voice'); return x ? x === 'on' : MODE === 'host'; }
+function pickVoice(){
+  try {
+    const vs = speechSynthesis.getVoices().filter(v => /^it/i.test(v.lang));
+    VOICE.v = vs.find(v => /google/i.test(v.name)) || vs.find(v => /alice|federica|luca|elsa|paola|isabella/i.test(v.name)) || vs[0] || null;
+  } catch(e){}
+}
+if (VOICE.ok){ pickVoice(); try { speechSynthesis.addEventListener('voiceschanged', pickVoice); } catch(e){} }
+const cleanSpeech = t => String(t || '').replace(/\b[A-ZÀ-Ý]{4,}\b/g, w => w.toLowerCase()).replace(/_{3}/g, ' … ').replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '').replace(/\s+/g, ' ').trim();
+function say(parts, interrupt = true){
+  if (!voiceOn()) return;
+  try {
+    if (interrupt) speechSynthesis.cancel();
+    parts.map(cleanSpeech).filter(Boolean).forEach(t => {
+      const u = new SpeechSynthesisUtterance(t);
+      u.lang = 'it-IT'; if (VOICE.v) u.voice = VOICE.v; u.rate = 1.05; u.pitch = 1.05;
+      speechSynthesis.speak(u);
+    });
+  } catch(e){}
+}
+function hush(){ try { if (VOICE.ok) speechSynthesis.cancel(); } catch(e){} }
+// su iPhone la voce si attiva solo dopo un primo tocco
+document.addEventListener('pointerdown', () => {
+  if (!VOICE.ok || VOICE.unlocked || !voiceOn()) return;
+  VOICE.unlocked = true;
+  try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch(e){}
+}, {passive:true});
+const ORD = ['Prima', 'Seconda', 'Terza', 'Quarta', 'Quinta', 'Sesta', 'Settima', 'Ottava', 'Nona', 'Decima'];
+const readAnswers = list => list.map((parts, i) => (list.length > 2 ? ORD[i] + ' risposta: ' : i ? 'Oppure: ' : '') + parts.join(', ') + '.');
+const endOfRound = next => /Round|Classifica/.test(next || '');
+// cosa dice il presentatore a ogni nuova schermata
+function narrate(v){
+  if (v.type === 'wait' && /^Round/.test(v.title || '')) say([v.title + '!', v.msg]);
+  else if (v.type === 'show') say([v.prompt, ...readAnswers(v.answers.map(a => a.parts))]);
+  else if (v.type === 'vote' || v.type === 'tally') say(['Votate!'], false);
+  else if (v.type === 'winner') say([v.title, v.sub]);
+  else if (v.type === 'board' && v.final) say([v.title]);
+  else if (v.type === 'board' && endOfRound(v.next) && v.board && v.board[0]) say([`In testa c'è ${v.board[0].name}, con ${v.board[0].score} punti.`], false);
+}
+// lo stesso, per lo schermo dell'host in modalità "solo schermo"
+function narrateScreen(){
+  const m = cur();
+  if (H.phase === 'intro') say([(H.round < 3 ? 'Round ' + H.round : 'Round finale') + '!', introText()]);
+  else if (H.phase === 'show' && m) say([m.prompt, ...readAnswers(m.order.map(id => m.answers[id]))]);
+  else if (H.phase === 'vote') say(['Votate!'], false);
+  else if (H.phase === 'winner' && m){ const wt = winnerText(m); say([wt.title, wt.sub]); }
+  else if (H.phase === 'points' && endOfRound(nextLabel())){ const s0 = sorted()[0]; if (s0) say([`In testa c'è ${s0.name}, con ${s0.score} punti.`], false); }
+  else if (H.phase === 'end'){ const s1 = sorted(), top = s1.filter(x => x.score === s1[0].score); say([top.length > 1 ? 'Pareggio finale!' : top[0].name + ' vince la partita!']); }
+}
+
+/* ===================== SUONI E VIBRAZIONE ===================== */
+// suoni generati al momento (niente file da scaricare); si spengono dal pulsante in fondo alla pagina
+const SND = {on: load('tb_sound') !== 'off', ctx:null, noise:null, last:'', cur:'', tick:0};
+function actx(){
+  if (!SND.on) return null;
+  try {
+    if (!SND.ctx){ const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; SND.ctx = new C(); }
+    if (SND.ctx.state === 'suspended') SND.ctx.resume();
+    return SND.ctx;
+  } catch(e){ return null; }
+}
+// i browser attivano l'audio solo dopo un tocco
+['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => { if (SND.on) actx(); }, {passive:true}));
+function tone(freq, at, dur, o = {}){
+  const c = actx(); if (!c) return;
+  try {
+    const t = c.currentTime + at, osc = c.createOscillator(), g = c.createGain();
+    osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(freq, t);
+    if (o.slide) osc.frequency.exponentialRampToValueAtTime(freq * o.slide, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(o.vol || 0.12, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(g); g.connect(c.destination); osc.start(t); osc.stop(t + dur + 0.05);
+  } catch(e){}
+}
+function clap(at, vol){
+  const c = actx(); if (!c) return;
+  try {
+    if (!SND.noise){ const b = c.createBuffer(1, c.sampleRate, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; SND.noise = b; }
+    const t = c.currentTime + at, src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    src.buffer = SND.noise; f.type = 'bandpass'; f.frequency.value = 1200 + Math.random() * 1500; f.Q.value = 0.8;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+    src.connect(f); f.connect(g); g.connect(c.destination); src.start(t, Math.random() * 0.8, 0.15);
+  } catch(e){}
+}
+const SFX = {
+  jingle(){ [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.1, 0.2, {type:'square', vol:0.05})); },
+  ding(at){ tone(880, at, 0.25, {type:'triangle', vol:0.16}); tone(1320, at + 0.06, 0.3, {type:'triangle', vol:0.08}); },
+  tick(last){ tone(last ? 1250 : 950, 0, 0.06, {type:'square', vol:0.05}); },
+  pop(){ tone(520, 0, 0.14, {vol:0.16, slide:1.7}); },
+  fanfare(){ [[523,0],[659,.12],[784,.24],[1047,.36],[784,.54],[1047,.66]].forEach(([f, d]) => tone(f, d, 0.3, {type:'sawtooth', vol:0.045})); },
+  applause(){ for (let i = 0; i < 45; i++) clap(Math.random() * 1.8, 0.04 + Math.random() * 0.06); },
+  buzz(){ tone(150, 0, 0.5, {type:'sawtooth', vol:0.09}); tone(142, 0.02, 0.5, {type:'square', vol:0.05}); }
+};
+function vibrate(p){ try { if (SND.on && navigator.vibrate) navigator.vibrate(p); } catch(e){} }
+// suono per ogni nuova schermata (telefoni e host che gioca)
+function soundFor(v){
+  SND.cur = v.status ? 'answer' : v.type;
+  const k = v.type + '|' + (v.prompt || '') + '|' + (v.title || '') + '|' + (v.final ? 1 : 0);
+  if (k === SND.last) return; SND.last = k;
+  narrate(v);
+  if (v.type === 'show'){ SFX.jingle(); v.answers.forEach((a, i) => SFX.ding(0.8 + i * v.step)); }
+  else if (v.type === 'vote'){ SFX.pop(); vibrate([80, 60, 80]); }
+  else if (v.type === 'winner'){
+    if (/Stessa risposta/.test(v.title)) SFX.buzz();
+    else { SFX.fanfare(); if (/CAPPOTTO/.test(v.sub || '')) setTimeout(() => SFX.applause(), 600); }
+    if (/Hai vinto|tra i vincitori/.test(v.mine || '')) vibrate(250);
+  }
+  else if (v.type === 'board' && v.final){ SFX.fanfare(); setTimeout(() => SFX.applause(), 700); }
+  else if (v.type === 'wait' && /^Round/.test(v.title || '')) SFX.jingle();
+}
+// suoni dello schermo dell'host quando non gioca (modalità "solo schermo")
+function screenSound(){
+  if (H.me) return;
+  const m = cur();
+  SND.cur = H.phase;
+  narrateScreen();
+  if (H.phase === 'intro') SFX.jingle();
+  else if (H.phase === 'show' && m){ SFX.jingle(); m.order.forEach((id, i) => SFX.ding(1 + i * revealStep(m))); }
+  else if (H.phase === 'vote') SFX.pop();
+  else if (H.phase === 'winner' && m){ if (m.jinx) SFX.buzz(); else { SFX.fanfare(); if (m.cappotto) setTimeout(() => SFX.applause(), 600); } }
+  else if (H.phase === 'end'){ SFX.fanfare(); setTimeout(() => SFX.applause(), 700); }
 }
 
 /* ===================== TIMER VISIVO ===================== */
@@ -1823,6 +2127,9 @@ setInterval(() => {
   if (!end){ num.textContent = ''; if (bar) bar.style.width = '0%'; return; }
   const left = Math.max(0, end - Date.now());
   num.textContent = Math.ceil(left / 1000);
+  const secs = Math.ceil(left / 1000);
+  if (secs > 5 || secs < 1) SND.tick = 0;
+  else if (secs !== SND.tick && ['answer', 'vote', 'tally'].includes(SND.cur)){ SND.tick = secs; SFX.tick(secs === 1); }
   if (bar) bar.style.width = (total ? left / total * 100 : 0) + '%';
 }, 200);
 

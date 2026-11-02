@@ -647,12 +647,14 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.19';
+const VERSION = '1.20';
 // Un blocco per giorno (il più recente in cima). Aggiornamento nello stesso giorno: aggiungi la riga in cima al blocco e alza "to".
 const PATCH_NOTES = [
+  {date:'2 novembre 2026', from:'1.20', to:'1.20', items:[
+    'Nuova icona del gioco nella scheda del browser e sulla schermata Home'
+  ]},
   {date:'1 novembre 2026', from:'1.17', to:'1.19', items:[
     'Il presentatore legge ad alta voce frasi, risposte e vincitori (di base sul dispositivo dell\'host)',
-    'Nuova icona del gioco nella scheda del browser e sulla schermata Home',
     'Pubblico: chi arriva a partita iniziata o a stanza piena guarda e vota',
     'L\'host può far uscire un giocatore o passare il ruolo di host a un altro',
     'Suoni e vibrazione, che si spengono in fondo alla pagina',
@@ -1021,7 +1023,7 @@ function hostMsg(conn, d){
       p = {id:'p' + (++H.seq), name, score:0, conn, connected:true, tok, color: COLORS.find(c => !used.includes(c)) || COLORS[0]};
       H.players.push(p);
     }
-    p.seen = Date.now();
+    p.seen = Date.now(); p.ver = String(d.ver || '');
     send(conn, {t:'joined', name:p.name});
     broadcast(); renderHost(); return;
   }
@@ -1294,7 +1296,7 @@ function kick(id){
 // l'host passa il ruolo a un altro giocatore: la stanza (stesso codice) si sposta sul suo telefono
 function makeHost(id){
   const p = H.players.find(x => x.id === id);
-  if (!p || p.conn === LOCAL || !p.connected || H.phase !== 'lobby') return;
+  if (!p || p.conn === LOCAL || !p.connected || !p.ver || H.phase !== 'lobby') return;
   const meName = H.me ? (byId(H.me.id) || {}).name : '';
   if (!confirm(`Vuoi passare il ruolo di host a ${p.name}? La stanza ${H.code} resta la stessa e tutti si ricollegano da soli.${meName ? ' Tu resterai nella stanza come giocatore.' : ''}`)) return;
   readSettings();
@@ -1509,7 +1511,7 @@ UPD.lobby = () => {
   const others = [...H.players.filter(p => p.conn !== LOCAL), ...H.audience];
   $('#manage').innerHTML = others.length ? `<h3>Gestisci la stanza</h3>${others.map(p => `<div class="mrow">
       <span class="dot" style="background:${p.color}"></span><span class="mname">${esc(p.name)}${p.aud ? ' <span class="muted small">(pubblico)</span>' : ''}</span>
-      ${!p.aud && p.connected ? `<button class="btn small ghost" data-act="host" data-id="${p.id}">Rendi host</button>` : ''}
+      ${!p.aud && p.connected && p.ver ? `<button class="btn small ghost" data-act="host" data-id="${p.id}">Rendi host</button>` : ''}
       <button class="btn small ghost danger" data-act="kick" data-id="${p.id}">Espelli</button></div>`).join('')}` : '';
   const b = $('#startBtn'), miss = 3 - H.players.length;
   b.disabled = miss > 0;
@@ -1736,7 +1738,7 @@ function connect(retry){
   peer.on('open', () => {
     if (P.peer !== peer) return;
     const conn = peer.connect(PREFIX + P.code, {reliable:true}); P.conn = conn;
-    conn.on('open', () => conn.send({t:'join', name:P.name, tok:myTok()}));
+    conn.on('open', () => conn.send({t:'join', name:P.name, tok:myTok(), ver:VERSION}));
     conn.on('data', d => { P.lastPong = Date.now(); playerMsg(d, to); });
     conn.on('close', () => { if (P.conn !== conn) return; if (P.joined) lostConn(); else fail('Connessione interrotta. Riprova.'); });
   });
