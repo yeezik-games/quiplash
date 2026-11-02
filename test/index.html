@@ -15,6 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --bg:#1b0f3b; --ink:#1b0f3b; --yellow:#ffd23f; --pink:#ff4fa3; --cyan:#3ee6d0;
@@ -271,6 +272,34 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
 .tbarv div{height:100%;background:linear-gradient(90deg,var(--pink),var(--yellow));border-radius:99px;transition:width .4s}
 .tcount{font-family:Bungee,sans-serif;font-size:18px;margin-top:6px}
 .home{max-width:480px;gap:22px}
+.accbar{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;flex-wrap:wrap}
+.accme{display:inline-flex;align-items:center;gap:8px;font-size:16px}
+.accav{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--c);color:var(--ink);font:800 15px Rubik,sans-serif;flex:none}
+.acclink{padding:8px 4px}
+.accbtn{display:inline-flex;align-items:center;gap:6px;color:#fff}
+.accplay{display:flex;align-items:center;gap:10px;background:#f4f1ff;border-radius:14px;padding:12px 14px;font-weight:600}
+.gprev{margin:-6px 0 0;font-size:14px;color:#6b5b9a}
+.gprev b{color:var(--ink)}
+.link.inl{display:inline;padding:0;color:#6b2fb3;font-size:14px;text-decoration:underline}
+.vbadge{width:1em;height:1em;vertical-align:-.15em;margin-left:3px;flex:none}
+.accsheet .noteshead{gap:10px}
+.seg{display:flex;background:#eee8ff;border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:8px 14px;font:800 15px Rubik,sans-serif;color:#6b5b9a;cursor:pointer}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.acch{margin:12px 0 4px;font-size:22px}
+.acchint{margin:0 0 14px;color:#6b5b9a;font-size:14px}
+.accform{display:flex;flex-direction:column;gap:12px}
+.orline{display:flex;align-items:center;gap:10px;color:#6b5b9a;font-size:13px;margin:14px 0}
+.orline::before,.orline::after{content:'';flex:1;height:1px;background:#e3dcff}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;font-size:17px;white-space:nowrap;width:100%;max-width:none;background:#fff;color:var(--ink);border:2px solid #e3dcff;box-shadow:none}
+.soon{background:#eee8ff;color:#6b5b9a;font-size:11px;font-weight:800;border-radius:99px;padding:2px 8px;text-transform:uppercase;letter-spacing:.05em}
+.uwrap{position:relative;display:block}
+.ustate{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:800}
+.ustate.ok{color:#1f8a3a}.ustate.bad{color:#c62828}
+.card .rmsg.ok{color:#1f8a3a}.card .rmsg.bad,.accsheet .rmsg.bad{color:#c62828}.accsheet .rmsg.ok{color:#1f8a3a}
+.usug{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ugchip{border:2px solid #e3dcff;background:#fff;border-radius:99px;padding:6px 10px;font:700 14px Rubik,sans-serif;color:var(--ink);cursor:pointer}
+.urules{margin:0;padding-left:18px;color:#6b5b9a;font-size:13px;line-height:1.5}
 .manage{display:flex;flex-direction:column;gap:8px;width:100%;max-width:520px}
 .manage h3{margin:6px 0 2px}
 .mrow{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:14px;padding:8px 10px;flex-wrap:wrap}
@@ -635,6 +664,32 @@ const PROMPTS = [
   "Guida di sopravvivenza al lunedì: ___ appena sveglio e ___ prima di pranzo."
 ];
 
+/* ===================== ACCOUNT (come Sintonia, progetto condiviso yeezik-games) ===================== */
+// Account: email + password e nome utente univoco. Ospite: nome anon_… riservato al dispositivo.
+// Stesso sito di Sintonia: accesso, ID del dispositivo e nome ospite sono condivisi tra i due giochi.
+const SB_URL = 'https://ncwuekrvibuynvozqyqx.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jd3Vla3J2aWJ1eW52b3pxeXF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MDM0NTQsImV4cCI6MjEwOTE3OTQ1NH0.bQ84kmd0dDVTykZgCceOPjMHXE3y99lwP8RLEQozQJU';
+let sbc = null;
+try { if (window.supabase && window.supabase.createClient) sbc = window.supabase.createClient(SB_URL, SB_KEY); } catch(e){ sbc = null; }
+const ACC = {session:null, profile:null, devIds:new Set(), screen:'', loading:false};
+const lsJ = k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } };
+const lsJset = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
+const DEVICE_ID = (() => { let d = lsJ('sintonia_device'); if (!d || typeof d !== 'string' || d.length < 8){ d = 'dev-' + Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10); lsJset('sintonia_device', d); } return d; })();
+const guestSaved = lsJ('sintonia_guest') || {};
+const cleanUser = v => String(v || '').toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 16);
+const guestPreview = n => 'anon_' + (cleanUser(n) || '…');
+const myUid = () => ACC.profile ? ACC.profile.id : null;
+// riserva il nome ospite (anon_…) per questo dispositivo; senza servizio account il nome resta libero come prima
+async function claimGuest(raw){
+  if (!sbc) return String(raw || '').trim().slice(0, 16);
+  const {data, error} = await sbc.rpc('claim_guest_name', {p_name:raw, p_device:DEVICE_ID});
+  if (error) throw error;
+  Object.assign(guestSaved, {raw, name:data}); lsJset('sintonia_guest', guestSaved);
+  return data;
+}
+const VBADGE = '<svg class="vbadge" viewBox="0 0 24 24" role="img" aria-label="Sviluppatore verificato"><path fill="#4dd6ff" d="M12 1.5l2.6 1.9 3.2-.2 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.2L12 22.5l-2.6-1.9-3.2.2-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.2z"/><path d="M7.6 12.3l3 3 5.8-6" fill="none" stroke="#120f1f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const badge = uid => uid && ACC.devIds.has(uid) ? VBADGE : '';
+
 /* ===================== UTILITY ===================== */
 // Versione di prova: se il gioco è aperto da /test/ usa stanze separate e mostra l'etichetta TEST
 const IS_TEST = /\/test\/?$/.test(location.pathname.replace(/index\.html$/, ''));
@@ -648,9 +703,12 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.19';
+const VERSION = '1.20';
 // Un blocco per giorno (il più recente in cima). Aggiornamento nello stesso giorno: aggiungi la riga in cima al blocco e alza "to".
 const PATCH_NOTES = [
+  {date:'2 novembre 2026', from:'1.20', to:'1.20', items:[
+    'Account come in Sintonia: accedi con email o gioca come ospite (anon_nome)'
+  ]},
   {date:'1 novembre 2026', from:'1.17', to:'1.19', items:[
     'Il presentatore legge ad alta voce frasi, risposte e vincitori (di base sul dispositivo dell\'host)',
     'Pubblico: chi arriva a partita iniziata o a stanza piena guarda e vota',
@@ -808,7 +866,9 @@ function home(){
   hush();
   document.body.dataset.mode = '';
   MODE = null; window.onbeforeunload = null;
+  ACC.screen = 'home';
   app.innerHTML = `<div class="screen center home">
+    ${accBarHTML()}
     ${signHTML()}
     <p class="hometag">Riempi i buchi. Sfida un amico.<br>Fai ridere tutti.</p>
     <div class="stack">
@@ -829,6 +889,170 @@ function home(){
   </div>`;
   $('#bHost').onclick = hostSetup;
   $('#bJoin').onclick = () => joinScreen();
+  wireAccBar();
+}
+
+/* ===================== ACCOUNT: schermate ===================== */
+const ICO_USER = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>';
+// barra in alto nella homepage
+function accBarHTML(){
+  if (!sbc) return '';
+  if (ACC.profile) return `<div class="accbar"><span class="accme"><span class="accav" style="--c:${esc(ACC.profile.color || '#ffd23f')}">${esc(ACC.profile.username[0].toUpperCase())}</span><b>${esc(ACC.profile.username)}</b>${badge(ACC.profile.id)}</span><button class="link acclink" data-acc="logout">Esci</button></div>`;
+  return `<div class="accbar"><span class="muted small">${guestSaved.name ? 'Giochi come <b style="color:#fff">' + esc(guestSaved.name) + '</b>' : 'Stai giocando come ospite'}</span><button class="btn small ghost accbtn" data-acc="login">${ICO_USER}Accedi</button></div>`;
+}
+function wireAccBar(){
+  document.querySelectorAll('[data-acc]').forEach(b => b.onclick = async () => {
+    if (b.dataset.acc === 'login') openLogin();
+    else if (confirm("Uscire dall'account?")){ try { await sbc.auth.signOut(); } catch(e){} }
+  });
+}
+// campo nome in "Crea una partita" ed "Entra con un codice"
+function nameFieldHTML(id){
+  if (ACC.profile) return `<div class="accplay"><span class="accav" style="--c:${esc(ACC.profile.color || '#ffd23f')}">${esc(ACC.profile.username[0].toUpperCase())}</span><span>Giochi come <b>${esc(ACC.profile.username)}</b>${badge(ACC.profile.id)}</span></div>`;
+  const raw = guestSaved.raw || (sbc ? '' : load('tb_name'));
+  return `<label>Il tuo nome<input id="${id}" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(raw)}" placeholder="Es. pietro"></label>
+    ${sbc ? `<p class="gprev">Giocherai come <b id="${id}prev">${esc(guestPreview(raw))}</b></p>
+    <p class="muted small" style="margin:0">Hai un account? <button class="link inl" id="${id}login">Accedi</button></p>` : ''}
+    <div class="err" id="${id}err" hidden></div>`;
+}
+function wireNameField(id, go){
+  const i = document.getElementById(id); if (!i) return;
+  const pv = document.getElementById(id + 'prev'); if (pv) i.oninput = () => { pv.textContent = guestPreview(i.value); };
+  i.onkeydown = e => { if (e.key === 'Enter') go(); };
+  const lg = document.getElementById(id + 'login'); if (lg) lg.onclick = openLogin;
+}
+// restituisce il nome con cui giocare: quello dell'account, oppure il nome ospite riservato (anon_…)
+async function resolveName(id, btn){
+  if (ACC.profile) return ACC.profile.username;
+  const i = document.getElementById(id), er = document.getElementById(id + 'err');
+  const raw = (i ? i.value : '').trim();
+  if (!raw || !/[a-zA-Z0-9]/.test(raw)){ if (i){ i.classList.add('shake'); setTimeout(() => i.classList.remove('shake'), 400); i.focus(); } return ''; }
+  if (sbc && guestSaved.raw === raw && /^anon_/.test(guestSaved.name || '')) return guestSaved.name;
+  if (btn) btn.disabled = true;
+  try {
+    const n = await claimGuest(raw);
+    if (sbc && n !== guestPreview(raw) && er){ er.hidden = false; er.textContent = `Quel nome era già usato: giochi come ${n}`; }
+    return n;
+  } catch(e){
+    if (er){ er.hidden = false; er.textContent = 'Non riesco a registrare il nome, controlla la connessione e riprova.'; }
+    return '';
+  } finally { if (btn) btn.disabled = false; }
+}
+// finestra Accedi / Registrati (come in Sintonia)
+let loginMode = 'login';
+function openLogin(){
+  if (!sbc) return;
+  const m = document.createElement('div'); m.className = 'notes';
+  const close = () => m.remove();
+  const draw = () => {
+    m.innerHTML = `<div class="notesbox accsheet" role="dialog" aria-modal="true" aria-label="Accedi">
+      <div class="noteshead"><div class="seg"><button type="button" data-m="login" class="${loginMode === 'login' ? 'on' : ''}">Accedi</button><button type="button" data-m="signup" class="${loginMode === 'signup' ? 'on' : ''}">Registrati</button></div><button class="notesx" aria-label="Chiudi">✕</button></div>
+      <div class="notesbody">
+        <h2 class="acch">${loginMode === 'login' ? 'Bentornato' : 'Crea il tuo account'}</h2>
+        <p class="acchint">${loginMode === 'login' ? 'Lo stesso account di Sintonia e degli altri giochi Yeezik.' : 'Poi sceglierai il tuo nome utente. Vale anche per Sintonia e gli altri giochi Yeezik.'}</p>
+        <form id="lform" class="accform">
+          <label>Email<input id="lemail" type="email" autocomplete="email" required></label>
+          <label>Password<input id="lpass" type="password" minlength="6" autocomplete="${loginMode === 'login' ? 'current-password' : 'new-password'}" required></label>
+          <p class="rmsg bad" id="lerr"></p>
+          <button type="submit" class="btn big" id="lgo">${loginMode === 'login' ? 'Accedi' : 'Crea account'}</button>
+        </form>
+        <div class="orline">oppure</div>
+        <button type="button" class="btn big gbtn" disabled aria-disabled="true" title="Presto disponibile"><svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continua con Google<span class="soon">presto</span></button>
+      </div></div>`;
+    m.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { loginMode = b.dataset.m; draw(); });
+    m.querySelector('.notesx').onclick = close;
+    m.querySelector('#lform').onsubmit = async e => {
+      e.preventDefault();
+      const email = m.querySelector('#lemail').value.trim(), password = m.querySelector('#lpass').value, btn = m.querySelector('#lgo'), err = m.querySelector('#lerr');
+      if (password.length < 6){ err.className = 'rmsg bad'; err.textContent = 'La password deve avere almeno 6 caratteri'; return; }
+      btn.disabled = true; err.textContent = '';
+      try {
+        if (loginMode === 'login'){ const {error} = await sbc.auth.signInWithPassword({email, password}); if (error) throw error; close(); }
+        else {
+          const {data, error} = await sbc.auth.signUp({email, password, options:{emailRedirectTo: location.origin + location.pathname}});
+          if (error) throw error;
+          if (!data.session){ err.className = 'rmsg ok'; err.textContent = 'Ti abbiamo mandato un’email: apri il link per confermare l’account, poi accedi.'; } else close();
+        }
+      } catch(x){
+        const msg = x.message || ''; err.className = 'rmsg bad';
+        err.textContent = /Invalid login/i.test(msg) ? 'Email o password sbagliate' : /already registered|already been registered/i.test(msg) ? 'Questa email ha già un account: accedi'
+          : /not confirmed/i.test(msg) ? 'Devi prima confermare l’email dal link che ti abbiamo mandato' : /rate limit/i.test(msg) ? 'Troppi tentativi, riprova tra poco' : 'Non riuscito: ' + msg;
+      }
+      btn.disabled = false;
+    };
+  };
+  m.onclick = e => { if (e.target === m) close(); };
+  draw(); document.body.appendChild(m);
+  setTimeout(() => { const e = m.querySelector('#lemail'); if (e) e.focus(); }, 100);
+}
+// primo accesso: scelta del nome utente (univoco, come in Sintonia)
+function usernameScreen(){
+  MODE = null; ACC.screen = 'username';
+  app.innerHTML = `<div class="screen phone center">
+    ${signHTML(true)}
+    <div class="card form">
+      <h3>Scegli il tuo nome utente</h3>
+      <p class="muted small" style="margin:0;color:#6b5b9a">Ti serve per giocare e farti riconoscere. È solo tuo e vale anche per Sintonia e gli altri giochi Yeezik.</p>
+      <label>Nome utente<span class="uwrap"><input id="uname" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="es. yeezik"><span id="ustate" class="ustate"></span></span></label>
+      <p class="rmsg" id="umsg"></p>
+      <div id="usug" class="usug"></div>
+      <ul class="urules"><li>Da 3 a 16 caratteri</li><li>Lettere minuscole, numeri, punto e trattino basso</li></ul>
+      <button class="btn big" id="usave" disabled>Continua</button>
+    </div>
+    <button class="link" id="uout">Non sei tu? Esci dall'account</button></div>`;
+  const i = $('#uname'); let t = null, seq = 0;
+  const set = (ok, msg, sug) => {
+    $('#ustate').textContent = ok === true ? '✓' : ok === false ? '✕' : '';
+    $('#ustate').className = 'ustate ' + (ok === true ? 'ok' : ok === false ? 'bad' : '');
+    $('#umsg').className = 'rmsg ' + (ok === true ? 'ok' : ok === false ? 'bad' : ''); $('#umsg').textContent = msg || '';
+    $('#usug').innerHTML = sug && sug.length ? `<span class="muted small" style="color:#6b5b9a">Liberi per te:</span> ${sug.map(x => `<button type="button" class="ugchip" data-v="${esc(x)}">${esc(x)}</button>`).join('')}` : '';
+    $('#usug').querySelectorAll('[data-v]').forEach(b => b.onclick = () => { i.value = b.dataset.v; i.oninput(); });
+    $('#usave').disabled = ok !== true;
+  };
+  const check = async () => {
+    const v = i.value, my = ++seq;
+    if (v.length < 3) return set(null, v ? 'Almeno 3 caratteri' : '');
+    if (/^anon_/.test(v)) return set(false, 'I nomi che iniziano con anon_ sono per gli ospiti');
+    set(null, 'Controllo…');
+    const base = v.replace(/[._]+$/, '');
+    const cands = [v, `${base}.${['dj','yo','xo','live'][Math.floor(Math.random()*4)]}`, `${base}_${10 + Math.floor(Math.random()*90)}`, `${base}${100 + Math.floor(Math.random()*900)}`, `the.${base}`, `${base}.it`].map(x => x.slice(0, 16));
+    const {data, error} = await sbc.rpc('usernames_available', {p_names:cands});
+    if (my !== seq) return;
+    if (error) return set(null, 'Non riesco a controllare il nome, riprova');
+    if (data.includes(v)) set(true, `${v} è libero`); else set(false, `${v} è già preso`, data.filter(x => x !== v).slice(0, 3));
+  };
+  i.oninput = () => { const c = cleanUser(i.value); if (c !== i.value) i.value = c; clearTimeout(t); t = setTimeout(check, 350); };
+  i.onkeydown = e => { if (e.key === 'Enter' && !$('#usave').disabled) $('#usave').click(); };
+  $('#usave').onclick = async () => {
+    const v = i.value; $('#usave').disabled = true;
+    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    const res = await sbc.from('profiles').insert({id:ACC.session.user.id, username:v, color}).select().single();
+    if (res.error){ set(false, res.error.code === '23505' ? `${v} è appena stato preso, scegline un altro` : 'Non riuscito, riprova'); return; }
+    ACC.profile = res.data; home();
+  };
+  $('#uout').onclick = async () => { try { await sbc.auth.signOut(); } catch(e){} };
+  setTimeout(() => i.focus(), 100);
+}
+// sessione: carico il profilo e aggiorno solo le schermate fuori dalla partita
+async function onSession(sess){
+  const prev = ACC.session && ACC.session.user && ACC.session.user.id;
+  ACC.session = sess || null;
+  if (!sess){ ACC.profile = null; refreshAccScreens(); return; }
+  if (ACC.profile && prev === sess.user.id) return;
+  const {data, error} = await sbc.from('profiles').select('*').eq('id', sess.user.id).maybeSingle();
+  if (error) return;
+  ACC.profile = data || null;
+  if (!ACC.profile){ if (['home', 'setup', 'join', ''].includes(ACC.screen) && !P.joined && MODE !== 'host') usernameScreen(); return; }
+  refreshAccScreens();
+}
+function refreshAccScreens(){
+  if (MODE === 'host' || P.joined || P.peer) return;            // in partita non tocco niente
+  if (ACC.screen === 'home' || ACC.screen === 'username') home();
+  else if (ACC.screen === 'setup') hostSetup();
+  else if (ACC.screen === 'join') joinScreen();
+}
+async function loadBadges(){
+  try { const {data} = await sbc.rpc('player_badges'); ACC.devIds = new Set((data || []).filter(x => x.badge === 'dev').map(x => x.id)); refreshAccScreens(); } catch(e){}
 }
 
 /* ===================== HOST ===================== */
@@ -845,27 +1069,25 @@ const MAX_AUD = 50;
 function genCode(){ const L = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; let c = ''; for (let i = 0; i < 4; i++) c += L[Math.floor(Math.random()*L.length)]; return c; }
 
 function hostSetup(){
-  MODE = null;
+  MODE = null; ACC.screen = 'setup';
   app.innerHTML = `<div class="screen phone center">
     ${signHTML(true)}
     <div class="card form">
       <h3>Crea una partita</h3>
-      <label>Il tuo nome<input id="hname" maxlength="16" autocomplete="off" value="${esc(load('tb_name'))}" placeholder="Es. Pietro"></label>
+      ${nameFieldHTML('hname')}
       <button class="btn big" id="hgo">Crea la stanza e gioca</button>
       <p class="muted small" style="margin:0">Giocherai da questo dispositivo: rispondi e voti direttamente qui.</p>
     </div>
     <button class="link" id="honly">Usa solo come schermo (non gioco)</button>
     <button class="link" id="hback">← Indietro</button></div>`;
-  const go = () => {
-    const n = $('#hname').value.trim();
-    if (!n){ $('#hname').classList.add('shake'); setTimeout(() => $('#hname') && $('#hname').classList.remove('shake'), 400); $('#hname').focus(); return; }
+  const go = async () => {
+    const n = await resolveName('hname', $('#hgo')); if (!n) return;
     store('tb_name', n); hostStart(n);
   };
   $('#hgo').onclick = go;
-  $('#hname').onkeydown = e => { if (e.key === 'Enter') go(); };
+  wireNameField('hname', go);
   $('#honly').onclick = () => hostStart('');
   $('#hback').onclick = home;
-  $('#hname').focus();
 }
 
 /* L'host che gioca usa una "connessione" locale: passa per gli stessi messaggi dei telefoni. */
@@ -896,7 +1118,7 @@ function drawHP(){
   const key = viewKey(v);
   if (el.dataset.key === key){ updStatus(el, v); return; }
   el.dataset.key = key;
-  el.innerHTML = `<div class="ptop"><span class="dot" style="background:${v.color}"></span><b>👑 ${esc(v.name)}</b><span class="pill" style="margin-left:6px">Stanza ${H.code}</span><span class="pscore">${v.score} pt</span></div>`
+  el.innerHTML = `<div class="ptop"><span class="dot" style="background:${v.color}"></span><b>👑 ${esc(v.name)}${badge(v.uid)}</b><span class="pill" style="margin-left:6px">Stanza ${H.code}</span><span class="pscore">${v.score} pt</span></div>`
                + playerBody(Object.assign({}, v, {next:''}), false);
   setMode(v); soundFor(v);
   wirePlayer(el, v, d => hostMsg(LOCAL, d));
@@ -935,7 +1157,7 @@ function hostStart(myName, fixedCode, tries){
   peer.on('open', () => {
     opened = true; H.peer = peer; H.code = code; H.phase = 'lobby';
     H.me = myName ? {id:null, view:null} : null;
-    if (myName) hostMsg(LOCAL, {t:'join', name:myName});
+    if (myName) hostMsg(LOCAL, {t:'join', name:myName, uid:myUid()});
     renderHost(true); wake();
     window.onbeforeunload = () => 'Uscendo chiudi la partita per tutti.';
   });
@@ -1022,7 +1244,7 @@ function hostMsg(conn, d){
       p = {id:'p' + (++H.seq), name, score:0, conn, connected:true, tok, color: COLORS.find(c => !used.includes(c)) || COLORS[0]};
       H.players.push(p);
     }
-    p.seen = Date.now(); p.ver = String(d.ver || '');
+    p.seen = Date.now(); p.ver = String(d.ver || ''); p.uid = d.uid ? String(d.uid).slice(0, 40) : null;
     send(conn, {t:'joined', name:p.name});
     broadcast(); renderHost(); return;
   }
@@ -1219,7 +1441,7 @@ function winnerText(m){
 }
 // classifica generale da mandare ai telefoni
 function boardData(me, gains = {}){
-  return sorted().map(p => ({name:p.name, color:p.color, score:p.score, rank:rank(p), delta:gains[p.id] || 0, me:p.id === me.id, host:!!p.host}));
+  return sorted().map(p => ({name:p.name, uid:p.uid || null, color:p.color, score:p.score, rank:rank(p), delta:gains[p.id] || 0, me:p.id === me.id, host:!!p.host}));
 }
 function introText(){
   return H.round === 1 ? 'Ogni sfida vale 1000 punti, divisi in base ai voti. Prendi tutti i voti e fai CAPPOTTO: bonus!'
@@ -1336,16 +1558,16 @@ function playAgain(){
 
 /* --- viste dei telefoni (calcolate dall'host) --- */
 function viewFor(p){
-  const v = {name:p.name, score:p.score, color:p.color,
+  const v = {name:p.name, uid:p.uid || null, score:p.score, color:p.color,
              left: H.timerEnd ? Math.max(0, H.timerEnd - Date.now()) : 0, total: H.timerTotal};
   const W = (emoji, title, msg) => Object.assign(v, {type:'wait', emoji, title, msg});
   switch (H.phase){
-    case 'lobby': return Object.assign(v, {type:'lobby', code:H.code, players:H.players.map(x => ({name:x.name, color:x.color, host:!!x.host, me:x.id === p.id})), audience:H.audience.map(a => a.name)});
+    case 'lobby': return Object.assign(v, {type:'lobby', code:H.code, acct:!!p.uid, players:H.players.map(x => ({name:x.name, uid:x.uid || null, color:x.color, host:!!x.host, me:x.id === p.id})), audience:H.audience.map(a => a.name)});
     case 'intro': return W('🔥', H.round < 3 ? 'Round ' + H.round : 'Round finale', introText());
     case 'answer': {
       const mine = H.matchups.map((m, i) => ({m, i})).filter(x => x.m.players.includes(p.id));
       const todo = mine.filter(x => !x.m.answers[p.id]);
-      const status = H.players.map(x => ({name:x.name, color:x.color, host:!!x.host, me:x.id === p.id, off:!x.connected,
+      const status = H.players.map(x => ({name:x.name, uid:x.uid || null, color:x.color, host:!!x.host, me:x.id === p.id, off:!x.connected,
         done: H.matchups.every(m => !m.players.includes(x.id) || m.answers[x.id]),
         n: H.matchups.filter(m => m.players.includes(x.id) && m.answers[x.id]).length,
         tot: H.matchups.filter(m => m.players.includes(x.id)).length}));
@@ -1377,7 +1599,7 @@ function viewFor(p){
       const ids = answered(m).slice().sort((a, b) => (w.includes(b) - w.includes(a)) || (m.R[b].votes - m.R[a].votes));
       return Object.assign(v, {type:'winner', next:nextLabel(), title:wt.title, sub:wt.sub, mine, prompt:m.prompt,
         cards: ids.map(id => { const a = byId(id), r = m.R[id];
-          return {parts:m.answers[id], name:a.name, color:a.color, votes:r.votes, voters:r.voters, win:w.includes(id), mine:id === p.id}; })});
+          return {parts:m.answers[id], name:a.name, uid:a.uid || null, color:a.color, votes:r.votes, voters:r.voters, win:w.includes(id), mine:id === p.id}; })});
     }
     case 'points': {
       const m = cur(), gains = {};
@@ -1385,7 +1607,7 @@ function viewFor(p){
       const r = m.R && m.R[p.id];
       const title = r && m.answers[p.id] ? (r.pts > 0 ? '+' + r.pts + ' punti!' : 'Zero punti in questa sfida') : 'Risultati della sfida';
       const gl = answered(m).sort((a, b) => m.R[b].pts - m.R[a].pts).map(id => { const a = byId(id);
-        return {name:a.name, color:a.color, votes:m.R[id].votes, pts:m.R[id].pts, cappotto:m.cappotto === id, me:id === p.id}; });
+        return {name:a.name, uid:a.uid || null, color:a.color, votes:m.R[id].votes, pts:m.R[id].pts, cappotto:m.cappotto === id, me:id === p.id}; });
       return Object.assign(v, {type:'board', next:nextLabel(), title, gains:gl, board:boardData(p, gains)});
     }
     case 'scores': return W('📊', 'Sei ' + rank(p) + '°', `Hai ${p.score} punti. Guarda la classifica sullo schermo.`);
@@ -1432,7 +1654,7 @@ function renderHost(force){
   (VIEW[H.phase] || (() => {}))();
 }
 const chip = (p, extra = '', off = !p.connected) =>
-  `<span class="chip ${off ? 'off' : ''}" style="background:${p.color}">${p.host ? '👑 ' : ''}${esc(p.name)}${extra ? ' ' + extra : ''}</span>`;
+  `<span class="chip ${off ? 'off' : ''}" style="background:${p.color}">${p.host ? '👑 ' : ''}${esc(p.name)}${badge(p.uid)}${extra ? ' ' + extra : ''}</span>`;
 const roundLabel = () => H.round < 3 ? 'Round ' + H.round + ' di 3' : 'Round finale';
 const hdr = () => `<div class="hdr"><span class="pill">${roundLabel()}</span><span class="pill">Stanza ${H.code}</span></div>`;
 const joinUrl = () => location.origin + location.pathname + '?room=' + H.code;
@@ -1454,7 +1676,7 @@ VIEW.lobby = () => {
       <div id="plist" class="chips" style="justify-content:flex-start"></div>
       <div id="alist" class="muted small"></div>
       <div id="manage" class="manage"></div>
-      ${H.me ? `<div class="rename host">
+      ${H.me && myUid() ? `<div class="rename host"><div class="rlabel">Giochi con il tuo account: <b style="color:#fff">${esc(ACC.profile.username)}</b>${badge(myUid())}</div></div>` : H.me ? `<div class="rename host">
         <label class="rlabel" for="hrname">Il tuo nome</label>
         <div class="rrow"><input id="hrname" maxlength="16" autocomplete="off" value="${esc((byId(H.me.id) || {}).name || '')}"><button class="btn small alt" id="hrbtn">Cambia nome</button></div>
         <div id="hrmsg" class="rmsg"></div></div>` : ''}
@@ -1483,11 +1705,12 @@ VIEW.lobby = () => {
     const b = e.target.closest('button[data-act]'); if (!b) return;
     if (b.dataset.act === 'kick') kick(b.dataset.id); else makeHost(b.dataset.id);
   };
-  if (H.me){
+  if (H.me && $('#hrbtn')){
     const doRename = () => {
       const n = $('#hrname').value.trim();
       if (!n){ $('#hrmsg').className = 'rmsg bad'; $('#hrmsg').textContent = 'Scrivi un nome.'; return; }
-      hostMsg(LOCAL, {t:'rename', name:n});
+      claimGuest(n).then(nn => { $('#hrname').value = nn; hostMsg(LOCAL, {t:'rename', name:nn}); })
+        .catch(() => { $('#hrmsg').className = 'rmsg bad'; $('#hrmsg').textContent = 'Non riesco a registrare il nome, controlla la connessione.'; });
     };
     $('#hrbtn').onclick = doRename;
     $('#hrname').onkeydown = e => { if (e.key === 'Enter') doRename(); };
@@ -1681,7 +1904,7 @@ UPD.end = () => {};
 const P = {peer:null, conn:null, name:'', code:'', joined:false, lastKey:'', localEnd:0, total:0};
 
 function joinScreen(err){
-  MODE = 'player'; window.onbeforeunload = null; document.body.dataset.mode = '';
+  MODE = 'player'; window.onbeforeunload = null; document.body.dataset.mode = ''; ACC.screen = 'join';
   const qs = new URLSearchParams(location.search);
   const code = (qs.get('room') || P.code || load('tb_code') || '').toUpperCase();
   const name = P.name || load('tb_name');
@@ -1690,21 +1913,21 @@ function joinScreen(err){
     <div class="card form">
       ${err ? `<div class="err">${esc(err)}</div>` : ''}
       <label>Codice stanza<input id="jcode" maxlength="4" autocomplete="off" autocapitalize="characters" value="${esc(code)}" placeholder="ABCD"></label>
-      <label>Il tuo nome<input id="jname" maxlength="16" autocomplete="off" value="${esc(name)}" placeholder="Es. Pietro"></label>
+      ${nameFieldHTML('jname')}
       <button class="btn big" id="jgo">Entra</button>
     </div>
     <button class="link" id="jback">← Indietro</button></div>`;
-  const go = () => {
-    const c = $('#jcode').value.trim().toUpperCase().replace(/[^A-Z]/g, ''), n = $('#jname').value.trim();
+  const go = async () => {
+    const c = $('#jcode').value.trim().toUpperCase().replace(/[^A-Z]/g, '');
     if (c.length !== 4){ $('#jcode').classList.add('shake'); setTimeout(() => $('#jcode') && $('#jcode').classList.remove('shake'), 400); return; }
-    if (!n){ $('#jname').classList.add('shake'); setTimeout(() => $('#jname') && $('#jname').classList.remove('shake'), 400); return; }
+    const n = await resolveName('jname', $('#jgo')); if (!n) return;
     P.code = c; P.name = n; P.resuming = false; store('tb_code', c); store('tb_name', n);
     connect();
   };
   $('#jgo').onclick = go;
-  $('#jname').onkeydown = e => { if (e.key === 'Enter') go(); };
+  wireNameField('jname', go);
   $('#jback').onclick = () => { P.stop = true; cleanupPlayer(); clearSess(); history.replaceState(null, '', location.pathname); home(); };
-  if (!code) $('#jcode').focus(); else if (!name) $('#jname').focus();
+  if (!code) $('#jcode').focus(); else if ($('#jname') && !$('#jname').value) $('#jname').focus();
 }
 
 const MAX_TRIES = 8;              // tentativi di riconnessione automatica
@@ -1737,7 +1960,7 @@ function connect(retry){
   peer.on('open', () => {
     if (P.peer !== peer) return;
     const conn = peer.connect(PREFIX + P.code, {reliable:true}); P.conn = conn;
-    conn.on('open', () => conn.send({t:'join', name:P.name, tok:myTok(), ver:VERSION}));
+    conn.on('open', () => conn.send({t:'join', name:P.name, tok:myTok(), ver:VERSION, uid:myUid()}));
     conn.on('data', d => { P.lastPong = Date.now(); playerMsg(d, to); });
     conn.on('close', () => { if (P.conn !== conn) return; if (P.joined) lostConn(); else fail('Connessione interrotta. Riprova.'); });
   });
@@ -1824,14 +2047,14 @@ function playerMsg(d, to){
 
 function lobbyPlayers(v){
   return `<div class="muted">Giocatori nella stanza ${esc(v.code)} (${v.players.length})</div>
-    <div class="chips">${v.players.map(x => `<span class="chip ${x.me ? 'mechip' : ''}" style="background:${x.color}">${x.host ? '👑 ' : ''}${esc(x.name)}${x.me ? ' (tu)' : ''}</span>`).join('')}</div>
+    <div class="chips">${v.players.map(x => `<span class="chip ${x.me ? 'mechip' : ''}" style="background:${x.color}">${x.host ? '👑 ' : ''}${esc(x.name)}${badge(x.uid)}${x.me ? ' (tu)' : ''}</span>`).join('')}</div>
     ${v.audience && v.audience.length ? `<div class="muted small">🍿 Pubblico: ${v.audience.map(esc).join(', ')}</div>` : ''}`;
 }
 function statusInner(st){
   const writing = st.filter(x => !x.done), done = st.filter(x => x.done);
   const row = x => `<div class="wrow ${x.done ? 'done' : 'writing'} ${x.me ? 'me' : ''}">
       <span class="dot" style="background:${x.color}"></span>
-      <span class="wname">${x.host ? '👑 ' : ''}${esc(x.name)}${x.me ? ' (tu)' : ''}</span>
+      <span class="wname">${x.host ? '👑 ' : ''}${esc(x.name)}${badge(x.uid)}${x.me ? ' (tu)' : ''}</span>
       <span class="wstate">${x.off ? '📡 disconnesso' : x.done ? '✅ ha finito'
         : `✍️ sta scrivendo${x.tot > 1 ? ` · ${x.n}/${x.tot} frasi` : ''}<span class="dots"><i>.</i><i>.</i><i>.</i></span>`}</span>
     </div>`;
@@ -1865,9 +2088,9 @@ function playerBody(v, panel){
     return `<div class="grow"><div class="emoji">🎉</div><h2 style="font-size:28px">Sei dentro!</h2>
       <p class="lead">Aspetta che l'host avvii la partita.</p>
       <div class="rename">
-        <div class="rcur">Il tuo nome: <b>${esc(v.name)}</b> <button class="btn small ghost" data-redit>✏️ Cambia nome</button></div>
+        <div class="rcur">${v.acct ? `Giochi con il tuo account: <b>${esc(v.name)}${badge(v.uid)}</b>` : `Il tuo nome: <b>${esc(v.name)}</b> <button class="btn small ghost" data-redit>✏️ Cambia nome</button>`}</div>
         <div class="rform" data-rform hidden>
-          <div class="rrow"><input data-rname maxlength="16" autocomplete="off" value="${esc(v.name)}" aria-label="Nuovo nome">
+          <div class="rrow"><input data-rname maxlength="16" autocomplete="off" value="${esc(v.name)}" aria-label="Nuovo nome" autocapitalize="off" spellcheck="false">
           <button class="btn small alt" data-rsave>Salva</button></div>
           <button class="link" data-rcancel>Annulla</button>
         </div>
@@ -1887,7 +2110,7 @@ function playerBody(v, panel){
       ${v.mine ? `<div class="mymsg">${esc(v.mine)}</div>` : ''}
       <div class="opts">${v.cards.map(c => `<div class="pcard ${c.win ? 'win' : 'lose'}" style="--c:${c.color}">
         ${c.win ? '<span class="tag">VINCE</span> ' : ''}${fill(v.prompt, c.parts)}
-        <div class="ameta"><span class="aname" style="background:${c.color}">${esc(c.name)}${c.mine ? ' (tu)' : ''}</span>
+        <div class="ameta"><span class="aname" style="background:${c.color}">${esc(c.name)}${badge(c.uid)}${c.mine ? ' (tu)' : ''}</span>
         <span class="votes">${c.votes} vot${c.votes === 1 ? 'o' : 'i'}</span>
         ${c.voters.length ? `<div class="voters">Votato da: ${c.voters.map(esc).join(', ')}</div>` : ''}</div></div>`).join('')}</div>`;
   }
@@ -1895,14 +2118,14 @@ function playerBody(v, panel){
     return `${v.next ? nextBarHTML(v.next) : ''}<div class="pbanner">${esc(v.title)}</div>
       ${v.sub ? `<p class="lead" style="text-align:center">${esc(v.sub)}</p>` : ''}
       ${v.gains.length ? `<h3>Punti della sfida</h3><div class="gains">${v.gains.map(g => `<div class="gain small ${g.me ? 'me' : ''}">
-        <span class="aname" style="background:${g.color}">${esc(g.name)}</span>
+        <span class="aname" style="background:${g.color}">${esc(g.name)}${badge(g.uid)}</span>
         <span class="muted">${g.votes} vot${g.votes === 1 ? 'o' : 'i'}</span>${g.cappotto ? '<span class="tag">CAPPOTTO</span>' : ''}
         <span class="gpts">+${g.pts}</span></div>`).join('')}</div>` : ''}
       <h3>${v.final ? 'Classifica finale' : 'Classifica generale'}</h3>
       <div class="pboard">${v.board.map(b => `<div class="prow ${b.me ? 'me' : ''}">
         <span class="ppos">${b.rank === 1 ? '🥇' : b.rank === 2 ? '🥈' : b.rank === 3 ? '🥉' : b.rank + '.'}</span>
         <span class="dot" style="background:${b.color}"></span>
-        <span class="pname">${b.host ? '👑 ' : ''}${esc(b.name)}${b.me ? ' (tu)' : ''}${b.delta ? ` <span class="delta">+${b.delta}</span>` : ''}</span>
+        <span class="pname">${b.host ? '👑 ' : ''}${esc(b.name)}${badge(b.uid)}${b.me ? ' (tu)' : ''}${b.delta ? ` <span class="delta">+${b.delta}</span>` : ''}</span>
         <span class="bpts">${b.score}</span></div>`).join('')}</div>`;
   }
   if (v.type === 'tally'){
@@ -1941,14 +2164,15 @@ function wirePlayer(root, v, sendFn){
   if (v.type === 'lobby'){
     const form = root.querySelector('[data-rform]'), cur = root.querySelector('.rcur'), inp = root.querySelector('[data-rname]');
     const msg = root.querySelector('[data-rmsg]'), save = root.querySelector('[data-rsave]');
-    root.querySelector('[data-redit]').onclick = () => { form.hidden = false; cur.hidden = true; msg.textContent = ''; inp.focus(); inp.select(); };
+    if (v.acct) return;
+    root.querySelector('[data-redit]').onclick = () => { form.hidden = false; cur.hidden = true; msg.textContent = ''; inp.value = guestSaved.raw || v.name.replace(/^anon_/, ''); inp.focus(); inp.select(); };
     root.querySelector('[data-rcancel]').onclick = () => { form.hidden = true; cur.hidden = false; msg.textContent = ''; inp.value = v.name; };
     const go = () => {
       const n = inp.value.trim();
       if (!n){ msg.className = 'rmsg bad'; msg.textContent = 'Scrivi un nome.'; inp.focus(); return; }
-      if (n === v.name){ form.hidden = true; cur.hidden = false; return; }
       save.disabled = true; msg.className = 'rmsg'; msg.textContent = 'Salvo…';
-      sendFn({t:'rename', name:n});
+      claimGuest(n).then(nn => { if (nn === v.name){ form.hidden = true; cur.hidden = false; msg.textContent = ''; save.disabled = false; return; } sendFn({t:'rename', name:nn}); })
+        .catch(() => { save.disabled = false; msg.className = 'rmsg bad'; msg.textContent = 'Non riesco a registrare il nome, controlla la connessione.'; });
     };
     save.onclick = go;
     inp.onkeydown = e => { if (e.key === 'Enter') go(); };
@@ -1985,7 +2209,7 @@ function renderPlayer(v){
   const key = viewKey(v);
   if (key === P.lastKey){ updStatus(app, v); return; }
   P.lastKey = key;
-  const top = `<div class="ptop"><span class="dot" style="background:${v.color}"></span><b>${esc(v.name)}</b><span class="pscore">${v.aud ? '🍿 Pubblico' : v.score + ' pt'}</span></div>`;
+  const top = `<div class="ptop"><span class="dot" style="background:${v.color}"></span><b>${esc(v.name)}${badge(v.uid)}</b><span class="pscore">${v.aud ? '🍿 Pubblico' : v.score + ' pt'}</span></div>`;
   app.innerHTML = `<div class="screen phone">${top}${playerBody(v, false)}</div>`;
   setMode(v); soundFor(v);
   wirePlayer(app, v, d => send(P.conn, d));
@@ -2133,6 +2357,10 @@ setInterval(() => {
 }, 200);
 
 /* ===================== AVVIO ===================== */
+if (sbc){
+  loadBadges();
+  try { sbc.auth.onAuthStateChange((ev, sess) => { if (ev === 'SIGNED_IN' || ev === 'SIGNED_OUT' || ev === 'INITIAL_SESSION') setTimeout(() => onSession(sess), 0); }); } catch(e){}
+}
 (() => {
   const room = (new URLSearchParams(location.search).get('room') || '').toUpperCase();
   const x = loadSess();
