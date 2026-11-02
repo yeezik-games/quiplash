@@ -344,6 +344,7 @@ body[data-mode="fight"]{background:radial-gradient(circle at 50% 0%,#8a1456 0,tr
   .lobbyR{text-align:left}
 }
 </style>
+  <script src="https://yeezikdev.github.io/yeezik-gameshub/hub-link.js" defer></script>
 </head>
 <body>
 <div id="app"></div>
@@ -647,9 +648,12 @@ if (IS_TEST){
 
 /* ===================== VERSIONE E PATCH NOTES ===================== */
 // Per ogni aggiornamento: aggiungi una voce IN CIMA e cambia VERSION.
-const VERSION = '1.20';
+const VERSION = '1.21';
 // Un blocco per giorno (il più recente in cima). Aggiornamento nello stesso giorno: aggiungi la riga in cima al blocco e alza "to".
 const PATCH_NOTES = [
+  {date:'2 novembre 2026', from:'1.21', to:'1.21', items:[
+    'In fondo alla home c\'è il riquadro per scoprire gli altri giochi di Yeezik Games Hub'
+  ]},
   {date:'2 novembre 2026', from:'1.20', to:'1.20', items:[
     'Nuova icona del gioco nella scheda del browser e sulla schermata Home'
   ]},
@@ -827,6 +831,7 @@ function home(){
         <div class="hnote n4"><b>4</b><p>Tre round e classifica: vince chi fa ridere.</p></div>
       </div>
     </section>
+    <yeezik-hub-link></yeezik-hub-link>
   </div>`;
   $('#bHost').onclick = hostSetup;
   $('#bJoin').onclick = () => joinScreen();
