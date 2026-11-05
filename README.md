@@ -2,7 +2,7 @@
 
 Party game in stile Quiplash: riempi i buchi delle frasi, sfida un altro giocatore e lascia che gli altri votino la risposta migliore.
 
-**Gioca:** https://yeezikdev.github.io/quiplash/
+**Gioca:** https://yeezik-games.github.io/quiplash/
 
 - Apri il sito su un PC o una TV e premi **Crea una partita**.
 - Ognuno entra dal telefono con il codice stanza o il QR (da 3 a 10 giocatori).
@@ -12,8 +12,8 @@ Funziona senza server: i telefoni si collegano allo schermo host con [PeerJS](ht
 
 ## Versione di prova
 
-- Gioco principale: https://yeezikdev.github.io/quiplash/
-- Versione di prova: https://yeezikdev.github.io/quiplash/test/
+- Gioco principale: https://yeezik-games.github.io/quiplash/
+- Versione di prova: https://yeezik-games.github.io/quiplash/test/
 
 Le modifiche si fanno prima in `test/index.html`. La versione di prova usa stanze separate e mostra l'etichetta "VERSIONE DI PROVA".
 Quando è tutto ok, per renderla principale basta copiare `test/index.html` su `index.html`.
